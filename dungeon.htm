@@ -2,7 +2,8 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-        <title>JavaScript Tile Map Scrolling</title> 
+        <title>JavaScript Tile Map Scrolling</title>
+        <link rel="stylesheet" href="css/screen.css" type="text/css" media="screen" charset="utf-8">
         <style type="text/css">
             body {
                 padding:0px;
@@ -18,10 +19,7 @@
 
         </style> 
         <script type="text/javascript" 
-                src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js">
-        </script>
-        <script type="text/javascript" 
-                src="sprite.js" >
+                src="js/jquery/jquery-1.7.2.min.js">
         </script>
         <script type="text/javascript" 
                 src="imageUtils.js" >
@@ -29,80 +27,24 @@
         <script type="text/javascript" 
                 src="sprite.js" >
         </script>
-
-        <script type="text/javascript">
-            var GAME = GAME || {};
-
-            $(function() {
-                
-                // Game wide variables and constants
-                GAME.container = $('#viewports');
-                GAME.tileWidth = 32;
-                GAME.tileHeight = 32;
-                GAME.offsetX = 0;
-                GAME.offsetY = 0;
-                GAME.heroes = [];
-                GAME.villians = [];
-                GAME.objects = [];
-                GAME.FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
-                GAME.FLIPPED_VERTICALLY_FLAG   = 0x40000000;
-                GAME.FLIPPED_DIAGONALLY_FLAG   = 0x20000000;
-                GAME.SYS_spriteParams = {
-                    width: 32,
-                    height: 32,
-                    images: 'DungeonCrawl_ProjectUtumnoTileset.png',
-                    $drawTarget: GAME.container
-                };
-
-                // Call the loadMap function. The callback passed
-                // is a function that scrolls each viewport according
-                // to mouse movement.
-                loadMap("sh-dungeon2.tmx", GAME.container, function(tileScrollers) {
-
-                    GAME.floor = tileScrollers[0]; // Floor from tmx-file
-                    GAME.walls = tileScrollers[1]; // Walls from tmx-file
-                    GAME.staticObjects = tileScrollers[2];
-                    console.log(tileScrollers[2]);
-                    
-                    // Create a matrix with obstructed tiles (only 'wall' tiles
-                    // are counted at this point
-                    GAME.obstructedTiles = [];
-                    var i = 0, x = -1, y = -1, mapLength = GAME.walls.map.length;
-                    // GAME.obstructedTiles[y] = [];
-                    for (i; i < mapLength; i++) {
-                        if (i % GAME.tilesAcross === 0) {
-                            y++;
-                            x = -1;
-                            GAME.obstructedTiles[y] = [];
-                        }
-                        x++;
-                        GAME.obstructedTiles[y][x] = GAME.walls.map[i] === 0 ? 0 : 1;
-                    }
-                    
-                    // Width and height of viewports.
-                    GAME.viewWidth = GAME.container.innerWidth();
-                    GAME.viewHeight = GAME.container.innerHeight();
-                            
-                    // Current scroll position.
-                    var scrollX = 0,
-                        scrollY = 0;
-                            
-                            
-                    GAME.floor.draw(scrollX, scrollY);
-                    GAME.walls.draw(scrollX, scrollY);
-                    GAME.staticObjects.draw(scrollX, scrollY, true);
-                   
-                    var char = ADV_elf(6, 9);
-                    
-                    // paintObstructedTiles();
-                });
-
-            });
+        <script type="text/javascript" 
+                src="js/sidebar.js" >
+        </script>
+        <script type="text/javascript" 
+                src="js/mouse.js" >
+        </script>
+        <script type="text/javascript" 
+                src="game.js" >
         </script>
 
     </head>
     <body>
         <!-- This div will contain the three viewports -->
         <div id="viewports"></div>
+        <!-- Actions for selected character -->
+        <div id="sidebarButtons">
+            <input type="button" id="moveButton" title="Flytta" />
+            <input type="button" id="attackButton" title="Attackera" />
+        </div>
     </body>
 </html> 

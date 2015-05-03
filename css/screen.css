@@ -1,0 +1,25 @@
+/* 
+    Document   : screen
+    Created on : 2015-maj-03, 17:41:52
+    Author     : mats
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+root { 
+    display: block;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    font-size: 65%;
+}
+
+#sidebarButtons {
+    position: absolute;
+    left: 900px;
+    top: 0;
+    overflow: hidden;
+}
+

@@ -7,6 +7,7 @@ var mouse = {
     gridY:0,
     // whether or not the left mouse button is currently pressed
     buttonPressed:false,
+    insideCanvas:false,
 
 	click:function(ev,rightClick){
 		// Player clicked inside the canvas
