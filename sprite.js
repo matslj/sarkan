@@ -1,15 +1,6 @@
 
 var GAME = GAME || {};
 
-//$(function() {
-//    GAME.SYS_spriteParams = {
-//        width: 32,
-//        height: 32,
-//        images: 'DungeonCrawl_ProjectUtumnoTileset.png',
-//        $drawTarget: $('#viewports')
-//   };
-//});
-
 /**
  * Creates a css background property. It uses CSS3 to set multiple backgrounds.
  * Example:
@@ -40,10 +31,6 @@ function processMultipleBackgrounds(backgroundCoords) {
     return background;
 }
 
-//function translatePixelsToMatrix() {
-//    
-//}
-
 /**
  * A sprite template. The sprite consists of a div-elementwith width, height and
  * backgroundimage defined by the incoming parameter-object.
@@ -69,15 +56,25 @@ function processMultipleBackgrounds(backgroundCoords) {
 var DHTMLSprite = function(params) {
     var width = params.width,
         height = params.height,
-        
+        // The elementBase represents the square that the character stands on.
         $elementBase = params.$drawTarget.append('<div/>').find(':last'), // this contains 'grid' cell for the element to be drawn
+        // The element is the actual character standing on the elementBase (se above).
         $element =  $elementBase.append('<div/>').find(':last'), // this contains the element to be drawn
+        // This is a shortcut to the style-property of the elementBase
         elemBaseStyle = $elementBase[0].style,
+        // This is a shortcut to the style-property of the element
         elemStyle = $element[0].style,
         $drawTarget = params.$drawTarget,
+        // The processed image-array of the character. In the bottom of
+        // the array consists of the naked character and the layers above
+        // represents accessories as trousers, sword, shield, etc.
         backgroundCSS = processMultipleBackgrounds(params.imgArray),
-        selected = false,
-        mathFloor = Math.floor;
+        unitX = 0,
+        unitY = 0,
+        mathFloor = Math.floor,
+        $selectedPath = null,
+        movement = params.movement,
+        pathLength = 0;
 
     // The cssdata which does not change over time for the sprite
     var cssObj = {
@@ -91,7 +88,7 @@ var DHTMLSprite = function(params) {
         left: '0px',
         top: -(height/3 >> 0) + 'px'
     };
-    console.log(cssObj);
+    // console.log(cssObj);
     $element.css(cssObj);
     $elementBase.css({
         position: 'absolute',
@@ -102,11 +99,16 @@ var DHTMLSprite = function(params) {
     var that = {
         // x and y in tile unit
         draw: function(x, y) {
+            unitX = x;
+            unitY = y;
             x = x * width; // convert from tile unit to pixels
             y = y * height; // convert from tile unit to pixels
             elemBaseStyle.left = x + 'px';
             elemBaseStyle.top = y + 'px';
             this.show();
+        },
+        getCoordinates: function() {
+            return {x:unitX, y:unitY};
         },
         show: function() {
             elemStyle.display = 'block';
@@ -117,17 +119,48 @@ var DHTMLSprite = function(params) {
         destroy: function() {
             $element.remove();
         },
-        setSelected: function(pSelected) {
-            if (!pSelected) {
-                elemBaseStyle.border = "1px solid transparent";
-            }
-            selected = pSelected;
+        select: function() {
+            elemBaseStyle.border = "1px solid yellow";
         },
-        isSelected: function() {
-            return selected;
+        deselect: function() {
+            elemBaseStyle.border = "1px solid transparent";
         },
         getCssAsObject: function() {
             return cssObj;
+        },
+        markMove: function(toX, toY) {
+            var coords = this.getCoordinates();
+//            var x = ((+(elemBaseStyle.left.replace("px", ""))/width) >>0);
+//            var y = ((+(elemBaseStyle.top.replace("px", ""))/height) >>0);
+            var x = coords.x, y = coords.y;
+            // console.log([x,y]);
+            // console.log(GAME.obstructedTiles);
+            var path = AStar(GAME.obstructedTiles, [x,y], [toX,toY]);
+            // console.log(path);
+            if ($selectedPath instanceof jQuery) {
+                $selectedPath.remove();
+            }
+            $selectedPath = GAME.container.append('<div/>').find(':last');
+            var i = 1;
+            pathLength = path.length;
+            for (i; i < pathLength; i++) {
+                // console.log(emptyTiles[i].x + " - " + emptyTiles[i].y)
+                var $el  = $selectedPath.append('<div/>').find(':last');
+                $el.css({
+                    position: 'absolute',
+                    width: GAME.tileWidth,
+                    height: GAME.tileHeight,
+                    backgroundColor: i<=5 ? 'rgba(0,255,0,0.3)' : i<=10 ? 'rgba(255,255,0,0.3)' : 'rgba(255,0,0,0.3)',
+                    left: path[i].x * GAME.tileWidth + 'px',
+                    top: path[i].y * GAME.tileHeight + 'px'
+                });
+            }
+        },
+        removePath: function() {
+            if ($selectedPath !== null && $selectedPath instanceof jQuery) {
+                pathLength = 0;
+                $selectedPath.remove();
+            }
         }
     };
     return that;
@@ -138,39 +171,12 @@ var ADV_elf = function (x, y) {
         // Background images; the char + all clothes and gear
         imgArray : [{x:10, y:39}, {x:8, y:36}, {x:2, y:34}, {x:15, y:35}, {x:6, y:33}, {x:0, y:31}],
         myX : x,
-        myY : y
+        myY : y,
+        movement : 10
     };
     var params = $.extend({}, GAME.SYS_spriteParams, localParams);
     var that = DHTMLSprite(params);
-    
-//    that.markMove = function(toX, toY) {
-//        selected = !selected;
-//        if (selected) {
-//            elemBaseStyle.border = "1px solid yellow";
-//            var x = ((+(elemBaseStyle.left.replace("px", ""))/width) >>0);
-//            var y = ((+(elemBaseStyle.top.replace("px", ""))/height) >>0);
-//            console.log([x,y]);
-//            console.log(GAME.obstructedTiles);
-//            var path = AStar(GAME.obstructedTiles, [x,y], [11, 9]);
-//            console.log(path);
-//            for (var i = 0; i < path.length; i++) {
-//                // console.log(emptyTiles[i].x + " - " + emptyTiles[i].y)
-//                var $el  = $drawTarget.append('<div/>').find(':last');
-//                $el.css({
-//                    position: 'absolute',
-//                    width: width,
-//                    height: height,
-//                    backgroundColor: 'blue',
-//                    left: path[i].x * width + 'px',
-//                    top: path[i].y * height + 'px'
-//                });
-//            }
-//            
-//        } else {
-//            elemBaseStyle.border = "1px solid transparent";
-//        }
-//    };
-    
+        
     that.draw(x, y);
        
     return that;

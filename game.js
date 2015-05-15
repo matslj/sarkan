@@ -12,8 +12,8 @@ $(function() {
     GAME.mapFile = "maps/sh-dungeon2.tmx";
     GAME.tileWidth = 32;
     GAME.tileHeight = 32;
-    GAME.offsetX = 0;
-    GAME.offsetY = 0;
+    GAME.offsetX = -4;
+    GAME.offsetY = -4;
     GAME.heroes = [];
     GAME.villians = [];
     GAME.objects = [];
@@ -67,8 +67,10 @@ $(function() {
         GAME.staticObjects.draw(scrollX, scrollY, true);
         
         sidebar.init();
+        mouse.init();
 
         var char = ADV_elf(6, 9);
+        GAME.heroes.push(char);
 
         // paintObstructedTiles();
     });
