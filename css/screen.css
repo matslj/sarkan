@@ -6,20 +6,154 @@
         Purpose of the stylesheet follows.
 */
 
-root { 
-    display: block;
+html, body {
+    padding: 0;
+    margin: 0;
+    font-size: 72%;
+    background-color: #000;
 }
 
-html, body {
-    margin: 0;
-    padding: 0;
-    font-size: 65%;
+#backdrop {
+    border-top: 4px solid #000;
+    border-bottom: 4px solid #000;
+    width: 100%;
+    height: 600px;
+}
+
+#bottom {
+    width: 100%;
+    height: 100%;
+    background-color: yellow;
+}
+
+/* Observera att sammanlagd border (top och left) maste tas hansyn till
+   som offset till viewportberakningar (for t.ex musposition) */
+#viewports {
+    position:absolute;
+    border-left:4px solid #000;
+    border-right:4px solid #000;
+    background-color: #000; /* #3090C7; */
+    width:864px;
+    height:600px;
+}
+
+#sidebar {
+    height: 580px;
+    margin-left: 872px;
+    border-right:4px solid #000;
+    background-color: #fff;
+    padding: 10px;
+}
+
+#sidebar .panel {
+    background-color: #FF1919;
+    border: 3px solid black;
+}
+
+#gameLogo {
+    background-color: #fff;
+    padding-top: 1px;
+    color: #FF1919;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+}
+
+#gameLogo h1 {
+    font-family: sans-serif;
+    text-align: center;
+    font-size: 3em;
+}
+
+#info {
+    padding: 10px;
+}
+
+#info .picture {
+    margin: 0 auto;
+    border: 1px solid #000;
+    width: 100px;
+    height: 100px;
+    background-color: #fff;
+}
+
+#info .picture.slantedEdges:before, #info .picture.slantedEdges:after {
+    width: 86px;
+}
+
+#info .stats {
+    margin-top: 10px;
+}
+
+#info .stats div {
+    display: table-cell;
+    vertical-align: middle;
+    height: 20px;
+}
+
+#info .stats div.label {
+    font-weight: bold;
+    padding-right: 5px;
+    padding-left: 10px;
+    font-size: 1.8em;
+}
+
+#info .stats div.edit {
+    background-color: white;
+    border: 1px solid #000;
+    width: 100px;
+    padding: 2px;
+}
+
+#info .stats div.edit.slantedEdges:before, #info .stats div.edit.slantedEdges:after {
+    width: 90px;
 }
 
 #sidebarButtons {
-    position: absolute;
-    left: 900px;
-    top: 0;
+    margin-top: 10px;
+}
+
+#sidebarButtons input {
+    width: 100px;
+    height: 50px;
+    margin-right: 10px;
+}
+
+/******************************************************************** 
+ *  Creates black corners on a div. In honour of the rpg paper form
+ *  from the 80's
+ */
+.slantedEdges { 
+    background: white;
+    border: 1px solid black;
+    position: relative; 
+} 
+
+.slantedEdges:before { 
+    content: ""; 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    border-bottom: 7px solid white; 
+    border-left: 7px solid black; 
+    border-right: 7px solid black;
+    height: 0; 
+} 
+
+.slantedEdges:after { 
+    content: ""; 
+    position: absolute; 
+    bottom: 0; 
+    left: 0; 
+    border-top: 7px solid white; 
+    border-left: 7px solid black; 
+    border-right: 7px solid black;
+    height: 0; 
+}
+
+/* Not used */
+#sidebarBtns {
+    position: relative;
+    left: 10px;
+    top: 10px;
     overflow: hidden;
 }
 

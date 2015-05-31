@@ -19,35 +19,35 @@ var mouse = {
             if (clickedItem) {
                 GAME.selected = clickedItem;
             }
-            mouse.selectDeselect();
+            GAME.selectDeselectGameObjects();
             sidebar.enableSidebarButtons();
         } else { // Player right clicked
             // Handle actions like attacking and movement of selected units
             if (GAME.selected) {
-                GAME.selected.markMove(mouse.gridX, mouse.gridY);
-            }
-        }
-    },
-    selectDeselect: function() {
-        var i = 0, length = GAME.heroes.length;
-        for (i; i < length; i++) {
-            if (GAME.selected !== null && GAME.heroes[i] === GAME.selected) {
-                GAME.heroes[i].select();
-            } else {
-                GAME.heroes[i].removePath();
-                GAME.heroes[i].deselect();
+                if (GAME.selected.type === "hero") {
+                    if (!clickedItem) {
+                        // Move
+                        GAME.selected.moveTo(mouse.gridX, mouse.gridY);
+                    } else if (clickedItem.type === "npc") {
+                        // Attack
+                        GAME.selected.moveTo(mouse.gridX, mouse.gridY, true);
+                    }
+                }
+                
+                // GAME.selectDeselectGameObjects();
+                
             }
         }
     },
     itemUnderMouse: function () {
         // console.log(mouse.gridX + ", " + mouse.gridY);
-        var i = 0, length = GAME.heroes.length;
-        var selectedItem = null;
+        var i = 0, length = GAME.objects.length;
+        var selectedItem = null, coord = null;
         for (i; i < length; i++) {
-            var coord= GAME.heroes[i].getCoordinates();
+            coord= GAME.objects[i].getCoordinates();
             if (coord.x == mouse.gridX &&
                     coord.y == mouse.gridY) {
-                selectedItem = GAME.heroes[i];
+                selectedItem = GAME.objects[i];
             }
         }
         

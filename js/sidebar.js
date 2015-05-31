@@ -1,22 +1,48 @@
+/**
+ * The sidebar.
+ * 
+ * @type type
+ */
 var sidebar = {
-    
-    buttons : {
+    buttons: {
         move: false,
         attack: false,
         search: false,
         stealth: false,
     },
-
+    /**
+     * Handles the hinding/showing of sidebar panels and buttons.
+     * Should be called when a new game object has been
+     * selected or when initializing the game.
+     * 
+     * @returns {undefined}
+     */
     enableSidebarButtons: function () {
         // Disable all
         $("#sidebarButtons input[type='button'] ").attr("disabled", true);
+        $(".objectView").hide();
+        sidebar.buttons.move = false;
         // If no selectable item is selected, then no point checking below
         if (!GAME.selected) {
             return;
         }
 
-        $("#sidebarButtons input[type='button'] ").attr("disabled", false);
+        if (GAME.selected.type === "npc") {
+            $("#npc").show();
+        }
+        if (GAME.selected.type === "hero") {
+            $("#hero").show();
+            $("#sidebarButtons input[type='button'] ").attr("disabled", false);
+            // When a hero is selected move is default
+            sidebar.buttons.move = true;
+        }
     },
+    /**
+     * Initializes sidebar. Should be called during game setup.
+     * Only needs to be called once.
+     * 
+     * @returns {undefined}
+     */
     init: function () {
         $("#moveButton").click(function () {
             sidebar.action("move");
@@ -25,7 +51,7 @@ var sidebar = {
             sidebar.action("attack");
         });
 
-        $("#sidebarButtons input[type='button'] ").attr("disabled", true);
+        sidebar.enableSidebarButtons();
     },
     action: function (action) {
         for (var property in sidebar.buttons) {
@@ -46,5 +72,8 @@ var sidebar = {
                     console.log("Default action");
             }
         }
+    },
+    setMoveData: function (moveData) {
+        $("#ffEdit").html(moveData);
     }
 };

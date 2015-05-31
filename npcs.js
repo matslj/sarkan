@@ -53,7 +53,7 @@ function processMultipleBackgrounds(backgroundCoords) {
  * @param {type} spriteArray
  * @returns {DHTMLSprite.that} an DHTMLSprite-instance
  */
-var DHTMLSprite = function(params) {
+var DHTMLSpriteNPC = function(params) {
     var width = params.width,
         height = params.height,
         // The elementBase represents the square that the character stands on.
@@ -71,7 +71,7 @@ var DHTMLSprite = function(params) {
         backgroundCSS = processMultipleBackgrounds(params.imgArray),
         unitX = 0,
         unitY = 0,
-        objType = "hero",
+        objType = "npc",
         mathFloor = Math.floor;
 
     var movement = {
@@ -84,8 +84,6 @@ var DHTMLSprite = function(params) {
     };
     
     var movePath = {
-        destX: 0, // tile units
-        destY: 0, // tile units
         $selected : null, // the aStar path (below) as a series of squares (divs) in a container element (div)
         list : null, // the array returned from aStar
         length : 0, // precalculated length of the aStar path (extracted from list.length)
@@ -147,26 +145,17 @@ var DHTMLSprite = function(params) {
         },
         deselect: function() {
             elemBaseStyle.border = "1px solid transparent";
-            movePath.remove();
+            //movePath.remove();
         },
         getCssAsObject: function() {
             return cssObj;
         },
         markMove: function(toX, toY) {
-            // Only recalculate if new destination is different from previous destination
-            if (movePath.destX === toX && movePath.destY === toY) {
-                return;
-            }
-            GAME.rebuildPassableGrid();
-            // Ange tilen man vill gå till som passable
-            GAME.currentMapPassableTiles[toY][toX] = 0;
             var coords = this.getCoordinates(); // Get current position in tile square units
 //            var x = ((+(elemBaseStyle.left.replace("px", ""))/width) >>0);
 //            var y = ((+(elemBaseStyle.top.replace("px", ""))/height) >>0);
             movePath.remove(); // Remove old path
-            movePath.destX = toX;
-            movePath.destY = toY;
-            movePath.list = AStar(GAME.currentMapPassableTiles, [coords.x,coords.y], [toX,toY]);
+            movePath.list = AStar(GAME.obstructedTiles, [coords.x,coords.y], [toX,toY]);
             movePath.$selected = GAME.container.append('<div/>').find(':last');
             var i = 1, m = 0;
             movePath.length = movePath.list.length;
@@ -183,37 +172,23 @@ var DHTMLSprite = function(params) {
                 });
             }
         },
-        moveTo : function(toX, toY, attack) {
+        moveTo : function(toX, toY) {
             if (movement.used < movement.max) {
-                attack = typeof attack !== "undefined" ? attack : false;
                 // Check if the move is a legal move; the toX and toY
                 // coordinates must be on the move path.
-                var i = 1, m = 0, found = -1, length;
-                length = attack ? movePath.length - 1 : movePath.length;
+                var i = 1, m = 0, found = -1;
                 for (i; i < movePath.length; i++) {
                     m = i + movement.used;
-                    if (attack) {
-                        if (m <= movement.half + 1) {
-                            if (movePath.list[i].x === toX && movePath.list[i].y === toY) {
-                                found = i;
-                            }
-                        }
-                    } else {
-                        if (m <= movement.max) {
-                            if (movePath.list[i].x === toX && movePath.list[i].y === toY) {
-                                found = i;
-                            }
+                    if (m <= movement.max) {
+                        if (movePath.list[i].x === toX && movePath.list[i].y === toY) {
+                            found = i;
                         }
                     }
                 }
                 if (found > 0) {
-                    if (attack) {
-                        found--;
-                    }
                     movement.used += found;
-                    this.draw(movePath.list[found].x, movePath.list[found].y);
+                    this.draw(toX, toY);
                 }
-                movePath.remove();
             }
         },
         getMovementObject : function() {
@@ -223,44 +198,26 @@ var DHTMLSprite = function(params) {
     return that;
 };
 
-var ADV_elf = function (x, y) {
+var Troll = function (x, y, theSubType) {
+    
+    var subType = {
+        mage : {x:21, y:7},
+        fighter : {x:20, y:7}
+    };
+    
     var localParams = {
         // Background images; the char + all clothes and gear
-        imgArray : [{x:10, y:39}, {x:8, y:36}, {x:2, y:34}, {x:15, y:35}, {x:6, y:33}, {x:0, y:31}],
+        imgArray : [subType[theSubType]],
         myX : x,
         myY : y,
         movement : 10
     };
     var params = $.extend({}, GAME.SYS_spriteParams, localParams);
-    var that = DHTMLSprite(params);
+    var that = DHTMLSpriteNPC(params);
         
     that.draw(x, y);
        
     return that;
 };
 
-/**
- * Help class for showing, on the grid, which tiles that
- * are obstructed.
- * 
- * @returns {undefined}
- */
-var paintObstructedTiles = function() {
-    for (var i = 0; i < GAME.tilesDown; i++) {
-        for( var j = 0; j < GAME.tilesAcross; j++) {
-            // console.log(emptyTiles[i].x + " - " + emptyTiles[i].y)
-            if (GAME.obstructedTiles[i][j]) {
-                var $el  = GAME.container.append('<div/>').find(':last');
-                $el.css({
-                    position: 'absolute',
-                    width: GAME.SYS_spriteParams.width,
-                    height: GAME.SYS_spriteParams.height,
-                    backgroundColor: 'blue',
-                    left: j * GAME.SYS_spriteParams.width + 'px',
-                    top: i * GAME.SYS_spriteParams.height + 'px'
-                });
-            }
-        }
-    }
-};
 

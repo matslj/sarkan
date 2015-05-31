@@ -2,22 +2,8 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-        <title>JavaScript Tile Map Scrolling</title>
+        <title>Sarkan</title>
         <link rel="stylesheet" href="css/screen.css" type="text/css" media="screen" charset="utf-8">
-        <style type="text/css">
-            body {
-                padding:0px;
-                margin:0px;           
-            }
-            #viewports {
-                position:absolute;
-                border:4px solid #000;
-                background-color:#3090C7;
-                width:864px;
-                height:600px;
-            }
-
-        </style> 
         <script type="text/javascript" 
                 src="js/jquery/jquery-1.7.2.min.js">
         </script>
@@ -29,6 +15,9 @@
         </script>
         <script type="text/javascript" 
                 src="sprite.js" >
+        </script>
+        <script type="text/javascript" 
+                src="npcs.js" >
         </script>
         <script type="text/javascript" 
                 src="js/sidebar.js" >
@@ -43,11 +32,35 @@
     </head>
     <body>
         <!-- This div will contain the three viewports -->
-        <div id="viewports"></div>
-        <!-- Actions for selected character -->
-        <div id="sidebarButtons">
-            <input type="button" id="moveButton" title="Flytta" />
-            <input type="button" id="attackButton" title="Attackera" />
+        <div id="backdrop">
+            <div id="viewports"></div>
+            <!-- Actions for selected character -->
+            <div id="sidebar">
+                <div id="gameLogo">
+                    <h1>Sarkan</h1>
+                </div>
+                <div id="hero" class="objectView">
+                    <div id="info" class="panel">
+                        <div class="picture slantedEdges"></div>
+                        <div class="stats">
+                            <div class="label">KP</div><div id="kpEdit" class="edit slantedEdges"></div>
+                            <div class="label">FF</div><div id="ffEdit" class="edit slantedEdges"></div>
+                        </div>
+                    </div>
+                    <div id="sidebarButtons">
+                        <input type="button" id="moveButton" value="Flytta" title="Flytta" />
+                        <input type="button" id="attackButton" value="Anfall" title="Anfall" />
+                    </div>
+                </div>
+                <div id="npc" class="objectView">
+                    <p></p>
+                </div>
+            </div>
+        </div>
+        <div id="bottom">
+            <div>
+                <div></div>
+            </div>
         </div>
     </body>
 </html> 
