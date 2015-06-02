@@ -12,12 +12,17 @@ $(function() {
     GAME.mapFile = "maps/sh-dungeon2.tmx";
     GAME.tileWidth = 32;
     GAME.tileHeight = 32;
-    GAME.offsetX = 0;
-    GAME.offsetY = 0;
+    GAME.offsetX = -4;
+    GAME.offsetY = -4;
     GAME.heroes = [];
-    GAME.villians = [];
+    GAME.npcs = [];
     GAME.objects = [];
     GAME.selected = null;
+    GAME.hero = {
+        $hitpoints : $('#kpEdit'),
+        $movementpoints : $('#ffEdit'),
+        $picture : $('#hero #info .picture')
+    };
     GAME.FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
     GAME.FLIPPED_VERTICALLY_FLAG   = 0x40000000;
     GAME.FLIPPED_DIAGONALLY_FLAG   = 0x20000000;
@@ -27,6 +32,37 @@ $(function() {
         images: 'img/DungeonCrawl_ProjectUtumnoTileset.png',
         $drawTarget: GAME.container
     };
+    
+    GAME.selectDeselectGameObjects = function() {
+        var i = 0, length = GAME.objects.length, tempObj = null, m;
+        for (i; i < length; i++) {
+            tempObj = GAME.objects[i];
+            if (GAME.selected !== null && tempObj === GAME.selected) {
+                tempObj.select();
+                if (tempObj.type === "hero") {
+                    m = tempObj.getMovementObject();
+                    sidebar.setMoveData(m.ffString());
+                }
+            } else {
+                tempObj.deselect();
+            }
+        }
+    };
+    
+    GAME.rebuildPassableGrid = function() {
+        GAME.currentMapPassableTiles = $.extend([],GAME.obstructedTiles);
+        var i = 0, length = GAME.objects.length, tempObj = null, c;
+        for (i; i < length; i++) {
+            tempObj = GAME.objects[i];
+            c = tempObj.getCoordinates();
+            GAME.currentMapPassableTiles[c.y][c.x] = 1;
+        }
+    };
+    
+    // Initiazlisers which can be loaded without the map being fully
+    // loaded.
+    sidebar.init();
+    mouse.init();
 
     // Call the loadMap function. The callback passed
     // is a function that scrolls each viewport according
@@ -61,14 +97,18 @@ $(function() {
         var scrollX = 0,
             scrollY = 0;
 
-
         GAME.floor.draw(scrollX, scrollY);
         GAME.walls.draw(scrollX, scrollY);
         GAME.staticObjects.draw(scrollX, scrollY, true);
         
-        sidebar.init();
-
         var char = ADV_elf(6, 9);
+        GAME.objects.push(char);
+        
+        var villian = Troll(14, 12, "mage");
+        GAME.objects.push(villian);
+        
+        villian = Troll(8, 13, "fighter");
+        GAME.objects.push(villian);
 
         // paintObstructedTiles();
     });
