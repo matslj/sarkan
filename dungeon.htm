@@ -8,16 +8,22 @@
                 src="js/jquery/jquery-1.7.2.min.js">
         </script>
         <script type="text/javascript" 
-                src="imageUtils.js" >
+                src="js/utils.js" >
         </script>
         <script type="text/javascript" 
                 src="js/astar.js" >
         </script>
-        <script type="text/javascript" 
-                src="sprite.js" >
+        <script type="text/javascript"
+                src="js/characterData.js" >
+        </script>
+        <script type="text/javascript"
+                src="js/sprite.js" >
         </script>
         <script type="text/javascript" 
-                src="npcs.js" >
+                src="js/adventurer/adventurer.js" >
+        </script>
+        <script type="text/javascript" 
+                src="js/npc/npc.js" >
         </script>
         <script type="text/javascript" 
                 src="js/sidebar.js" >
@@ -28,12 +34,14 @@
         <script type="text/javascript" 
                 src="game.js" >
         </script>
-
     </head>
     <body>
         <!-- This div will contain the three viewports -->
         <div id="backdrop">
             <div id="viewports"></div>
+            <div id="viewportButtons">
+                <a class="btn" href="#">Nästa SR</a>
+            </div>
             <!-- Actions for selected character -->
             <div id="sidebar">
                 <div id="gameLogo">

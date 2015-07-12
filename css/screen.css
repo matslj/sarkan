@@ -13,6 +13,10 @@ html, body {
     background-color: #000;
 }
 
+a {
+    outline: 0;
+}
+
 #backdrop {
     border-top: 4px solid #000;
     border-bottom: 4px solid #000;
@@ -35,6 +39,59 @@ html, body {
     background-color: #000; /* #3090C7; */
     width:864px;
     height:600px;
+}
+
+#vuuuu div {
+    position: absolute;
+    top: 556px;
+    left: 780px;
+    height: 28px;
+    width: 74px;
+    background-color: blue;
+    color: white;
+    font-size: 1.5em;
+    font-weight: bold;
+    padding-top: 12px;
+    padding-left: 6px;
+    border: 2px solid white;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+
+#viewportButtons {
+    position: absolute;
+    top: 560px;
+    left: 753px;
+}
+
+#viewportButtons .btn {
+  background: #f07878;
+  background-image: -webkit-linear-gradient(top, #f07878, #612e2e);
+  background-image: -moz-linear-gradient(top, #f07878, #612e2e);
+  background-image: -ms-linear-gradient(top, #f07878, #612e2e);
+  background-image: -o-linear-gradient(top, #f07878, #612e2e);
+  background-image: linear-gradient(to bottom, #f07878, #612e2e);
+  -webkit-border-radius: 5;
+  -moz-border-radius: 5;
+  border-radius: 5px;
+  text-shadow: 1px 1px 3px #666666;
+  font-family: Arial;
+  color: #ffffff;
+  font-size: 20px;
+  padding: 10px 10px 10px 10px;
+  border: solid #630e0e 2px;
+  text-decoration: none;
+}
+
+#viewportButtons .btn:hover {
+  background: #db6767;
+  background-image: -webkit-linear-gradient(top, #db6767, #783535);
+  background-image: -moz-linear-gradient(top, #db6767, #783535);
+  background-image: -ms-linear-gradient(top, #db6767, #783535);
+  background-image: -o-linear-gradient(top, #db6767, #783535);
+  background-image: linear-gradient(to bottom, #db6767, #783535);
+  text-decoration: none;
 }
 
 #sidebar {

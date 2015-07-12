@@ -6,58 +6,63 @@
 var GAME = GAME || {};
 
 $(function() {
-
+    
     // Game wide variables and constants
     GAME.container = $('#viewports');
-    GAME.mapFile = "maps/sh-dungeon2.tmx";
-    GAME.tileWidth = 32;
-    GAME.tileHeight = 32;
-    GAME.offsetX = -4;
-    GAME.offsetY = -4;
-    GAME.heroes = [];
-    GAME.npcs = [];
-    GAME.objects = [];
-    GAME.selected = null;
-    GAME.hero = {
-        $hitpoints : $('#kpEdit'),
-        $movementpoints : $('#ffEdit'),
-        $picture : $('#hero #info .picture')
-    };
-    GAME.FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
-    GAME.FLIPPED_VERTICALLY_FLAG   = 0x40000000;
-    GAME.FLIPPED_DIAGONALLY_FLAG   = 0x20000000;
-    GAME.SYS_spriteParams = {
-        width: 32,
-        height: 32,
-        images: 'img/DungeonCrawl_ProjectUtumnoTileset.png',
-        $drawTarget: GAME.container
-    };
     
-    GAME.selectDeselectGameObjects = function() {
-        var i = 0, length = GAME.objects.length, tempObj = null, m;
-        for (i; i < length; i++) {
-            tempObj = GAME.objects[i];
-            if (GAME.selected !== null && tempObj === GAME.selected) {
-                tempObj.select();
-                if (tempObj.type === "hero") {
-                    m = tempObj.getMovementObject();
-                    sidebar.setMoveData(m.ffString());
+    var tempGame = {
+        mapFile : "maps/sh-dungeon-v2.tmx",
+        tileWidth : 32,
+        tileHeight : 32,
+        offsetX : -4,
+        offsetY : -4,
+        objects : [],
+        selected : null,
+        hero : {
+            $hitpoints : $('#kpEdit'),
+            $movementpoints : $('#ffEdit'),
+            $picture : $('#hero #info .picture')
+        },
+        SYS_spriteParams : {
+            width: 32,
+            height: 32,
+            images: 'img/DungeonCrawl_ProjectUtumnoTileset.png',
+            $drawTarget: GAME.container
+        },
+        
+        selectDeselectGameObjects : function() {
+            var i = 0, length = GAME.objects.length, tempObj = null, sel = null, m;
+            for (i; i < length; i++) {
+                tempObj = GAME.objects[i];
+                if (GAME.selected !== null && tempObj === GAME.selected) {
+                    // sel = tempObj;
+                    tempObj.select();
+                } else {
+                    tempObj.deselect();
                 }
-            } else {
-                tempObj.deselect();
+            }
+//            if (sel) {
+//                sel.select();
+//                if (sel.type === "hero") {
+//                    m = sel.movement;
+//                    sidebar.setMoveData(m.ffString());
+//                }
+//            }
+        },
+        
+        rebuildPassableGrid : function() {
+            // Perform deep copy of obstructedTiles
+            GAME.currentMapPassableTiles = $.extend(true,[],GAME.obstructedTiles);
+            var i = 0, length = GAME.objects.length, tempObj = null, c;
+            for (i; i < length; i++) {
+                tempObj = GAME.objects[i];
+                c = tempObj.getCoordinates();
+                GAME.currentMapPassableTiles[c.y][c.x] = 1;
             }
         }
     };
     
-    GAME.rebuildPassableGrid = function() {
-        GAME.currentMapPassableTiles = $.extend([],GAME.obstructedTiles);
-        var i = 0, length = GAME.objects.length, tempObj = null, c;
-        for (i; i < length; i++) {
-            tempObj = GAME.objects[i];
-            c = tempObj.getCoordinates();
-            GAME.currentMapPassableTiles[c.y][c.x] = 1;
-        }
-    };
+    $.extend(GAME,tempGame);
     
     // Initiazlisers which can be loaded without the map being fully
     // loaded.
@@ -67,7 +72,7 @@ $(function() {
     // Call the loadMap function. The callback passed
     // is a function that scrolls each viewport according
     // to mouse movement.
-    loadMap(GAME.mapFile, GAME.container, function(tileScrollers) {
+    GAME.utils.loadMap(GAME.mapFile, GAME.container, function(tileScrollers) {
 
         GAME.floor = tileScrollers[0]; // Floor from tmx-file
         GAME.walls = tileScrollers[1]; // Walls from tmx-file
@@ -101,16 +106,19 @@ $(function() {
         GAME.walls.draw(scrollX, scrollY);
         GAME.staticObjects.draw(scrollX, scrollY, true);
         
-        var char = ADV_elf(6, 9);
+        var char = GAME.adventurer.Adventurer(GAME.characterData.elf);
+        char.draw(6, 9);
         GAME.objects.push(char);
         
-        var villian = Troll(14, 12, "mage");
+        var villian = GAME.npc.NPC(GAME.characterData.troll("mage"));
+        villian.draw(14, 12);
         GAME.objects.push(villian);
         
-        villian = Troll(8, 13, "fighter");
+        villian = GAME.npc.NPC(GAME.characterData.troll("fighter"));
+        villian.draw(8,13);
         GAME.objects.push(villian);
 
-        // paintObstructedTiles();
+        // GAME.adventurers.paintObstructedTiles();
     });
 
 });

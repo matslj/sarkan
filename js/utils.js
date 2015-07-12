@@ -1,4 +1,27 @@
-var imageUtils = {
+
+/** Define the GAME global which holds all the game data */
+var GAME = {
+    namespace: function(ns) {
+        var parts = ns.split("."),
+            object = this,
+            i, len;
+    
+        for (i=0, len = parts.length; i < len; i++) {
+            if (!object[parts[i]]) {
+                object[parts[i]] = {};
+            }
+            object = object[parts[i]];
+        }
+        
+        return object;
+    }
+};
+
+GAME.namespace("utils").imageUtils = {
+    
+    FLIPPED_HORIZONTALLY_FLAG : 0x80000000,
+    FLIPPED_VERTICALLY_FLAG   : 0x40000000,
+    FLIPPED_DIAGONALLY_FLAG   : 0x20000000,
     
     dec2Bin: function (dec){
         return (dec >>> 0).toString(2);
@@ -46,16 +69,31 @@ var imageUtils = {
      * @returns {undefined}
      */
     setCssRotation: function (elementStyle, hf, vf, df) {
-        elementStyle.webkitTransform = "rotate(" + imageUtils.getRotation(hf, vf, df) + "deg)";
-        elementStyle.MozTransform = "rotate(" + imageUtils.getRotation(hf, vf, df) + "deg)";
-        elementStyle.msTransform = "rotate(" + imageUtils.getRotation(hf, vf, df) + "deg)";
-        elementStyle.OTransform = "rotate(" + imageUtils.getRotation(hf, vf, df) + "deg)";
-        elementStyle.transform = "rotate(" + imageUtils.getRotation(hf, vf, df) + "deg)";
+        elementStyle.webkitTransform = "rotate(" + this.getRotation(hf, vf, df) + "deg)";
+        elementStyle.MozTransform = "rotate(" + this.getRotation(hf, vf, df) + "deg)";
+        elementStyle.msTransform = "rotate(" + this.getRotation(hf, vf, df) + "deg)";
+        elementStyle.OTransform = "rotate(" + this.getRotation(hf, vf, df) + "deg)";
+        elementStyle.transform = "rotate(" + this.getRotation(hf, vf, df) + "deg)";
+    },
+    
+    rotate : function(tileIndex, tiles, tileInView) {
+        // Mask out the flags for the different flipping directions. Through setting
+        // of one or more of these flags, rotation can be achieved.
+        var hf = (~(tileIndex & this.FLIPPED_HORIZONTALLY_FLAG) + 1) === this.FLIPPED_HORIZONTALLY_FLAG;
+        var vf = (tileIndex & this.FLIPPED_VERTICALLY_FLAG) === this.FLIPPED_VERTICALLY_FLAG;
+        var df = (tileIndex & this.FLIPPED_DIAGONALLY_FLAG) === this.FLIPPED_DIAGONALLY_FLAG;
+        // Clear flags from tileIndex. We need to do this to get the index position for
+        // the underlying image (the unrotated image).
+        tileIndex &= ~(this.FLIPPED_HORIZONTALLY_FLAG | this.FLIPPED_VERTICALLY_FLAG | this.FLIPPED_DIAGONALLY_FLAG);
+        // console.log("tileIndex: " + tileIndex + " hf: " + hf + " vf: " + vf + " df: " + df);
+        // Apply rotation through CSS
+        this.setCssRotation(tiles[tileInView], hf, vf, df);
+        return tileIndex;
     }
 };
 
-// One instance of tileScroller is required for each viewport.        
-var tileScroller = function(params) {
+// One instance of tileScroller is required for each viewport. 
+GAME.namespace("utils").tileScroller = function(params) {
 
     var that = {},
             $viewport = params.$viewport,
@@ -175,17 +213,7 @@ var tileScroller = function(params) {
                     // if handleRotations is set to true, it means that rotations
                     // for the layer should be considered.
                     if (handleRotations) {
-                        // Mask out the flags for the different flipping directions. Through setting
-                        // of one or more of these flags, rotation can be achieved.
-                        var hf = (~(tileIndex & GAME.FLIPPED_HORIZONTALLY_FLAG) + 1) === GAME.FLIPPED_HORIZONTALLY_FLAG;
-                        var vf = (tileIndex & GAME.FLIPPED_VERTICALLY_FLAG) === GAME.FLIPPED_VERTICALLY_FLAG;
-                        var df = (tileIndex & GAME.FLIPPED_DIAGONALLY_FLAG) === GAME.FLIPPED_DIAGONALLY_FLAG;
-                        // Clear flags from tileIndex. We need to do this to get the index position for
-                        // the underlying image (the unrotated image).
-                        tileIndex &= ~(GAME.FLIPPED_HORIZONTALLY_FLAG | GAME.FLIPPED_VERTICALLY_FLAG | GAME.FLIPPED_DIAGONALLY_FLAG);
-                        // console.log("tileIndex: " + tileIndex + " hf: " + hf + " vf: " + vf + " df: " + df);
-                        // Apply rotation through CSS
-                        imageUtils.setCssRotation(tiles[tileInView], hf, vf, df);
+                        tileIndex = GAME.utils.imageUtils.rotate(tileIndex, tiles, tileInView);
                     }
                     tiles[tileInView].visibility = 'visible';
                     tiles[tileInView++].backgroundPosition = tileBackPos[tileIndex];
@@ -201,7 +229,7 @@ var tileScroller = function(params) {
     return that;
 };
                 
-var loadMap = function(xmlFile, $viewports, callback) {
+GAME.namespace("utils").loadMap = function(xmlFile, $viewports, callback) {
     var tileScrollers = []; // Array of tileScroller instances for each viewport.
     $.ajax({
         type: "GET",
@@ -263,7 +291,7 @@ var loadMap = function(xmlFile, $viewports, callback) {
                     params.map.push(+mapText[i]);
                 }
                 // Create a tileScroller and save reference.
-                tileScrollers.push(tileScroller(params));
+                tileScrollers.push(GAME.utils.tileScroller(params));
             });
             // Call callback when map loaded, passing array
             // of tileScrollers as parameter.

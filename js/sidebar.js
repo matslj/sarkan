@@ -67,6 +67,7 @@ var sidebar = {
                     break;
                 case "attack":
                     console.log("Attacking");
+                    paintObstructedTiles();
                     break;
                 default:
                     console.log("Default action");
@@ -75,5 +76,29 @@ var sidebar = {
     },
     setMoveData: function (moveData) {
         $("#ffEdit").html(moveData);
+    },
+    refresh : function() {
+        // Disable all
+        $("#sidebarButtons input[type='button'] ").attr("disabled", true);
+        $(".objectView").hide();
+        sidebar.buttons.move = false;
+        
+        if (GAME.selected) {            
+            if (GAME.selected.type === "npc") {
+                $("#npc").show();
+            }
+            
+            if (GAME.selected.type === "hero") {
+                $("#hero").show();
+                
+                $("#ffEdit").html(GAME.selected.movement.ffString());
+                
+                if (GAME.selected.movement.used < GAME.selected.movement.max) {
+                    $("#sidebarButtons input[type='button'] ").attr("disabled", false);
+                    // When a hero is selected move is default
+                    sidebar.buttons.move = true;
+                } 
+            }
+        }
     }
 };
