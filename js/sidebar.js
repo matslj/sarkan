@@ -86,12 +86,37 @@ var sidebar = {
         if (GAME.selected) {            
             if (GAME.selected.type === "npc") {
                 $("#npc").show();
+                
+                $("#npc .header").html(GAME.selected.characterData.getTitle());
+                
+                // Update movement points
+                $("#npc div.ff").html(GAME.selected.movement.ffString());
+                
+                // Update movement points
+                $("#npc div.hp").html(GAME.selected.getHpString());
             }
             
             if (GAME.selected.type === "hero") {
                 $("#hero").show();
                 
+                $("#hero div.right div.namn").html(GAME.selected.characterData.name);
+                $("#hero div.right div.ras").html(GAME.selected.characterData.race);
+                $("#hero div.right div.yrke").html(GAME.selected.characterData.trade);
+                
+                // Update movement points
                 $("#ffEdit").html(GAME.selected.movement.ffString());
+                
+                
+                $("#hero table td.sty").html(GAME.selected.characterData.stats.sty);
+                $("#hero table td.fys").html(GAME.selected.characterData.stats.fys);
+                $("#hero table td.sto").html(GAME.selected.characterData.stats.sto);
+                $("#hero table td.int").html(GAME.selected.characterData.stats.int);
+                $("#hero table td.psy").html(GAME.selected.characterData.stats.psy);
+                $("#hero table td.smi").html(GAME.selected.characterData.stats.smi);
+                $("#hero table td.kar").html(GAME.selected.characterData.stats.kar);
+                
+                // Update movement points
+                $("#kpEdit").html(GAME.selected.getHpString());
                 
                 if (GAME.selected.movement.used < GAME.selected.movement.max) {
                     $("#sidebarButtons input[type='button'] ").attr("disabled", false);

@@ -1,6 +1,8 @@
 GAME.namespace("adventurer").Adventurer = function (params) {
 
-    var that = GAME.sprite.DHTMLSprite(params);
+    var that = GAME.sprite.DHTMLSprite(params),
+        target = null, // The target of an attack. There can be only one victim/turn.
+        attackLocked = false;
     
     /**
      * Overriding the old select function. Note that the old select function
@@ -8,17 +10,67 @@ GAME.namespace("adventurer").Adventurer = function (params) {
      * through a self calling function (with the old function as a parameter)
      * which returns a parameterless function.
      */
+    that.select = (function(oldSelect) {
+        return function() {
+            var callback = oldSelect;
+            callback();
+            if (target) {
+                target.markAttackedBy();
+            }
+        };
+    })(that.select);
+    
+    /**
+     * See comment over that.select.
+     */
     that.deselect = (function(oldDeselect) {
         return function() {
             var callback = oldDeselect;
             callback();
+            if (target) {
+                target.deselect();
+            }
             that.movePath.remove();
         };
     })(that.deselect);
     
+    /**
+     * Attack an NPC.
+     * 
+     * @param {type} theTarget the target of the attack. Must be an object of type
+     *               GAME.npc.NPC.
+     * @param {type} finalizeAttack if true th
+     * @returns {undefined}
+     */
+    that.attack = function(theTarget, finalizeAttack) {
+        if(that.movement.isMaxHalfUsed()) {
+            if (attackLocked === false) {
+                attackLocked = typeof finalizeAttack !== "undefined" ? finalizeAttack : false;
+                target = theTarget;
+                target.markAttackedBy();
+                that.movePath.remove();
+            }
+        } else {
+            GAME.utils.showErrorMsg("Mer än hälften av förflyttningen är förbrukad och då är inte anfall möjligt.");
+        }
+    };
+    
+    that.unAttack = function() {
+        if (!attackLocked) {
+            if (target) {
+                target.deselect();
+            }
+            target = null;
+        }
+    };
+    
+    that.isLocked = function() {
+        return attackLocked;
+    };
+    
     that.markMove = function(toX, toY) {
         // If this character has made an attack, his turn is over.
-        if (that.target !== null) {
+        if (attackLocked) {
             return;
         }
         GAME.rebuildPassableGrid();

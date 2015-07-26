@@ -64,8 +64,22 @@ GAME.sprite = {
             backgroundCSS = this.processMultipleBackgrounds(params.imgArray),
             unitX = 0,
             unitY = 0,
-            objType = params.type,
-            mathFloor = Math.floor;
+            staticCharData = {
+                type : params.type,
+                race : params.race,
+                name : params.name,
+                trade: params.trade,
+                stats: params.stats,
+                getTitle : function() {
+                    return this.name ? this.name : this.race;
+                }
+            },
+            hitPoints = {
+                current: params.hitPoints(),
+                max: params.hitPoints()
+            },
+            mathFloor = Math.floor,
+            target = null; // The target of an attack. There can be only one victim/turn.
 
         var movement = {
             max : params.movement,
@@ -74,8 +88,11 @@ GAME.sprite = {
             ffString : function() {
                 return this.used + " / " + this.max;
             },
-            canAttack : function() {
+            isMaxHalfUsed : function() {
                 return this.used <= this.half;
+            },
+            reset : function () {
+                this.used = 0;
             }
         };
 
@@ -115,7 +132,9 @@ GAME.sprite = {
         var that = {
             movement: movement,
             movePath: movePath,
-            type: objType,
+            type: staticCharData.type,
+            characterData: staticCharData,
+            target: target,
             // x and y in tile unit
             draw: function(x, y) {
                 unitX = x;
@@ -140,9 +159,15 @@ GAME.sprite = {
             },
             select: function() {
                 elemBaseStyle.border = "1px solid yellow";
+                if (target) {
+                    target.markAttackedBy();
+                }
             },
             deselect: function() {
                 elemBaseStyle.border = "1px solid transparent";
+                if (target) {
+                    target.deselect();
+                }
             },
             getCssAsObject: function() {
                 return cssObj;
@@ -150,8 +175,50 @@ GAME.sprite = {
             markAttackedBy: function() {
                 elemBaseStyle.border = "1px solid red";
             },
+            wound: function(damage) {
+                hitPoints.current -= damage;
+                if (hitPoints.current < 0) {
+                    hitPoints.current = 0;
+                    destroy();
+                }
+            },
+            heal: function(hp) {
+                hitPoints.current += hp;
+                if (hitPoints.current > hitPoints.max) {
+                    hitPoints.current = hitPoints.max;
+                }
+            },
+            getHpString: function() {
+                return hitPoints.current + " / " + hitPoints.max;
+            },
+            /**
+            * Attack an NPC.
+            * 
+            * @param {type} theTarget the target of the attack. Must be an object of type
+            *               GAME.npc.NPC.
+            * @param {type} finalizeAttack if true th
+            * @returns {undefined}
+            */
+            attack : function(theTarget, finalizeAttack) {
+                if(that.movement.isMaxHalfUsed()) {
+                    if (target === null) {
+                        // attackLocked = typeof finalizeAttack !== "undefined" ? finalizeAttack : false;
+                        target = theTarget;
+                        target.markAttackedBy();
+                        that.movePath.remove();
+                    }
+                } else {
+                    GAME.utils.showErrorMsg("Mer än hälften av förflyttningen är förbrukad och då är inte anfall möjligt.");
+                }
+            },
+            unAttack : function() {
+                if (that.target) {
+                    that.target.deselect();
+                }
+                that.target = null;
+            },
             isLocked : function() {
-                return false;
+                return target !== null;
             }
         };
         return that;

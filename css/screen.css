@@ -94,6 +94,10 @@ a {
   text-decoration: none;
 }
 
+/* --------------------------------------------------------------------------
+   -                 Sidebar
+   --------------------------------------------------------------------------*/
+
 #sidebar {
     height: 580px;
     margin-left: 872px;
@@ -140,28 +144,33 @@ a {
     margin-top: 10px;
 }
 
-#info .stats div {
+#info .stats div.divRow {
+    margin-bottom: 5px;
+}
+
+#info .stats div div {
     display: table-cell;
     vertical-align: middle;
     height: 20px;
 }
 
 #info .stats div.label {
-    font-weight: bold;
     padding-right: 5px;
-    padding-left: 10px;
-    font-size: 1.8em;
+    font-size: 1.4em;
+    width: 82px;
 }
 
 #info .stats div.edit {
     background-color: white;
     border: 1px solid #000;
-    width: 100px;
+    width: 50px;
     padding: 2px;
+    font-size: 1.4em;
+    text-align: center;
 }
 
 #info .stats div.edit.slantedEdges:before, #info .stats div.edit.slantedEdges:after {
-    width: 90px;
+    width: 40px;
 }
 
 #sidebarButtons {
@@ -172,6 +181,87 @@ a {
     width: 100px;
     height: 50px;
     margin-right: 10px;
+}
+
+/* --- the panel for the npcs --- */
+.npcPanel {
+    border: 2px solid black;
+}
+
+.npcPanel div.header {
+    background-color: black;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    font-size: 1.7em;
+    font-weight: bold;
+}
+
+/* ---- Basic stats for hero character ---- */
+
+#info table {
+    border: 0;
+    background: black;
+    border-spacing: 1px;
+}
+
+#info table th {
+    font-size: 1.4em;
+    text-align: left;
+    height: 20px;
+    background: white;
+    padding-left: 5px;
+}
+
+#info table td {
+    font-size: 1.4em;
+    height: 20px;
+    width: 100px;
+    background: #ff1919;
+}
+
+#info table td:first-child {
+    padding-left: 5px;
+}
+
+#info table td.slantedEdges {
+    width: 30px;
+    background: white;
+    text-align: center;
+}
+
+#info table td.slantedEdges:before, #info table td.slantedEdges:after {
+    width: 18px;
+}
+
+#info .left, #info .right {
+    float: left;
+}
+
+#info .right {
+    margin-left: 10px;
+}
+
+
+#info .right .whiteField {
+    background-color: white;
+    border: 1px solid black;
+    width: 141px;
+}
+
+#info .right .whiteField.no-top-border {
+    border-top: none;
+}
+
+#info .right .whiteField div:first-child {
+    font-size: 0.8em;
+    padding-left: 5px;
+}
+
+#info .right .whiteField div.value {
+    height: 20px;
+    padding-left: 5px;
+    font-size: 1.6em;
 }
 
 /******************************************************************** 
@@ -214,3 +304,43 @@ a {
     overflow: hidden;
 }
 
+/* ----- Overlay for dialogs ------ */
+
+.overlay-bg {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height:100%;
+    width: 100%;
+    cursor: pointer;
+    z-index: 1000; /* high z-index */
+    background: #000; /* fallback */
+    background: rgba(0,0,0,0.75);
+    
+    -moz-box-sizing: border-box; 
+    -webkit-box-sizing: border-box; 
+    box-sizing: border-box;
+}
+
+.overlay-content {
+    /* display: none; */
+    background: #fff;
+    padding: 1%;
+    width: 40%;
+    position: absolute;
+    top: 15%;
+    left: 50%;
+    margin: 0 0 0 -20%; /* add negative left margin for half the width to center the div */
+    cursor: default;
+    z-index: 10001;
+    border-radius: 4px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.9);
+    
+    color: red;
+}
+
+/* ---- General stuff ---- */
+div.clear {
+    clear: both;
+}

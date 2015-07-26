@@ -10,6 +10,7 @@ var mouse = {
     // whether or not the left mouse button is currently pressed
     buttonPressed: false,
     insideCanvas: false,
+    initiated: false,
     click: function (ev, rightClick) {
         // console.log("clicked");
 
@@ -33,6 +34,7 @@ var mouse = {
                     } else if (clickedItem.type === "npc") {
                         // Attack
                         var coord = GAME.selected.getCoordinates();
+                        // console.log("x: " + coord.x + ", " + coord.y);
                         if (mouse.checkIfAdjacent(coord.x, coord.y)) {
                             GAME.selected.attack(clickedItem, true);
                         }
@@ -45,7 +47,7 @@ var mouse = {
         sidebar.refresh();
     },
     itemUnderMouse: function () {
-        // console.log(mouse.gridX + ", " + mouse.gridY);
+//         console.log(mouse.gridX + ", " + mouse.gridY);
         var i = 0, length = GAME.objects.length;
         var selectedItem = null, coord = null;
         for (i; i < length; i++) {
@@ -84,12 +86,12 @@ var mouse = {
         var diffX = 0, diffY = 0;
         diffX = Math.abs(mouse.gridX - x);
         diffY = Math.abs(mouse.gridY - y);
-        return diffX === 1 || diffY === 1;
+        return diffX <= 1 && diffY <= 1;
     },
-    calculateGameCoordinates: function () {
+    calculateGameCoordinates: function (mX, mY) {
         // At the moment no offset is used
-        mouse.gameX = mouse.x + GAME.offsetX;
-        mouse.gameY = mouse.y + GAME.offsetY;
+        mouse.gameX = mX + GAME.offsetX;
+        mouse.gameY = mY + GAME.offsetY;
         
         mouse.gridXOld = mouse.gridX;
         mouse.gridYOld = mouse.gridY;
@@ -97,15 +99,8 @@ var mouse = {
         mouse.gridX = (mouse.gameX / GAME.tileWidth) >> 0;
         mouse.gridY = (mouse.gameY / GAME.tileHeight) >> 0;
     },
-    init: function () {
-        var $eventArea = GAME.container;
-
-        $eventArea.mousemove(function (ev) {
-            var offset = $eventArea.offset();
-            mouse.x = ev.pageX - offset.left;
-            mouse.y = ev.pageY - offset.top;
-
-            mouse.calculateGameCoordinates();
+    mouseMoveHandler : function(mX, mY) {
+        mouse.calculateGameCoordinates(mX, mY);
             
             // Only perform new action if grid position has changed
             if (mouse.gridX !== mouse.gridXOld || mouse.gridY !== mouse.gridYOld) {
@@ -117,7 +112,7 @@ var mouse = {
                         var itemUnderPointer = mouse.itemUnderMouse();
                         if (itemUnderPointer === null) {
                             if (GAME.selected.type === "hero") {
-                                GAME.selected.unAttack();
+//                                GAME.selected.unAttack();
                                 GAME.selected.markMove(mouse.gridX, mouse.gridY);
                             }
                         } 
@@ -141,9 +136,26 @@ var mouse = {
 //                    GAME.selected.markMove(mouse.gridX, mouse.gridY, true);
 //                }
 //            }
+    },
+    init: function () {
+        var $eventArea = GAME.container;
+        var offset = $eventArea.offset();
+
+        $eventArea.mousemove(function (ev) {
+            mouse.initiated = true;
+            mouse.x = ev.pageX - offset.left;
+            mouse.y = ev.pageY - offset.top;
+
+            mouse.mouseMoveHandler(mouse.x, mouse.y);
         });
 
         $eventArea.click(function (ev) {
+            if (!mouse.initiated) {
+                mouse.x = ev.pageX - offset.left;
+                mouse.y = ev.pageY - offset.top;
+
+                mouse.mouseMoveHandler(mouse.x, mouse.y);
+            }
             mouse.click(ev, false);
             return false;
         });

@@ -11,6 +11,9 @@
                 src="js/utils.js" >
         </script>
         <script type="text/javascript" 
+                src="js/combat.js" >
+        </script>
+        <script type="text/javascript" 
                 src="js/astar.js" >
         </script>
         <script type="text/javascript"
@@ -40,7 +43,7 @@
         <div id="backdrop">
             <div id="viewports"></div>
             <div id="viewportButtons">
-                <a class="btn" href="#">Nästa SR</a>
+                <a id="nextRound" class="btn" href="#">Nästa SR</a>
             </div>
             <!-- Actions for selected character -->
             <div id="sidebar">
@@ -49,11 +52,46 @@
                 </div>
                 <div id="hero" class="objectView">
                     <div id="info" class="panel">
-                        <div class="picture slantedEdges"></div>
-                        <div class="stats">
-                            <div class="label">KP</div><div id="kpEdit" class="edit slantedEdges"></div>
-                            <div class="label">FF</div><div id="ffEdit" class="edit slantedEdges"></div>
+                        <!--<div class="picture slantedEdges"></div>-->
+                        <div class="left">
+                            <table>
+                                <tr><th colspan="2">Grundegenskaper</th></tr>
+                                <tr><td>Styrka</td><td class="sty slantedEdges"></td></tr>
+                                <tr><td>Fysik</td><td class="fys slantedEdges"></td></tr>
+                                <tr><td>Storlek</td><td class="sto slantedEdges"></td></tr>
+                                <tr><td>Intelligens</td><td class="int slantedEdges"></td></tr>
+                                <tr><td>Psykisk kraft</td><td class="psy slantedEdges"></td></tr>
+                                <tr><td>Smidighet</td><td class="smi slantedEdges"></td></tr>
+                                <tr><td>Karisma</td><td class="kar slantedEdges"></td></tr>
+                            </table>
                         </div>
+                        <div class="right">
+                            <div class="whiteField">
+                                <div>Namn</div>
+                                <div class="value namn"></div>
+                            </div>
+                            <div class="whiteField no-top-border">
+                                <div>Ras</div>
+                                <div class="value ras"></div>
+                            </div>
+                            <div class="whiteField no-top-border">
+                                <div>Yrke</div>
+                                <div class="value yrke"></div>
+                            </div>
+                            <div class="stats">
+                                <div class="divRow">
+                                    <div class="label">Kroppspoäng</div><div id="kpEdit" class="edit slantedEdges"></div>
+                                </div>
+                                <div class="divRow">
+                                    <div class="label">Kraftpoäng</div><div id="ppEdit" class="edit slantedEdges"></div>
+                                </div>
+                                <div class="divRow">
+                                    <div class="label">Förflyttning</div><div id="ffEdit" class="edit slantedEdges"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clear"></div>
+                        
                     </div>
                     <div id="sidebarButtons">
                         <input type="button" id="moveButton" value="Flytta" title="Flytta" />
@@ -61,13 +99,24 @@
                     </div>
                 </div>
                 <div id="npc" class="objectView">
-                    <p></p>
+                    <div class="npcPanel">
+                        <div class="header"></div>
+                        <div class="hp"></div>
+                        <div class="ff"></div>
+                    </div>
                 </div>
             </div>
         </div>
         <div id="bottom">
             <div>
                 <div></div>
+            </div>
+        </div>
+        <div class="overlay-bg">
+            <div class="overlay-content">
+                <h3>Fatalt fel</h3>
+                <p></p>
+                <a href="#">[ Stäng ]</a>
             </div>
         </div>
     </body>

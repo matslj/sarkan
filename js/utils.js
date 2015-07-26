@@ -36,10 +36,10 @@ GAME.namespace("utils").imageUtils = {
      * </ul>
      * into rotation in degrees.
      * 
-     * @param {type} hf true = hor flip
-     * @param {type} vf true = vert flip
-     * @param {type} df true = diag flip
-     * @returns {Number}
+     * @param {Boolean} hf true = horizontal flip
+     * @param {Boolean} vf true = vertical flip
+     * @param {Boolean} df true = diagonal flip
+     * @returns {Number} rotation in degrees
      */
     getRotation: function (hf, vf, df) {
         if (hf && !vf && df) {
@@ -63,9 +63,9 @@ GAME.namespace("utils").imageUtils = {
      * </ul>
      * 
      * @param {type} elementStyle ref to the style property of an element
-     * @param {type} hf true = hor flip
-     * @param {type} vf true = vert flip
-     * @param {type} df true = diag flip
+     * @param {Boolean} hf true = horizontal flip
+     * @param {Boolean} vf true = vertical flip
+     * @param {Boolean} df true = diagonal flip
      * @returns {undefined}
      */
     setCssRotation: function (elementStyle, hf, vf, df) {
@@ -298,4 +298,61 @@ GAME.namespace("utils").loadMap = function(xmlFile, $viewports, callback) {
             callback(tileScrollers);
         }
     });
+};
+
+GAME.namespace("utils").showErrorMsg = function(msg) {
+    $(".overlay-content p").html(msg);
+    $(".overlay-bg").show();
+};
+
+GAME.namespace("utils").dice = {
+    
+    /**
+     * Rolls a die.
+     * 
+     * @param {Number} sides number of sides on the die. Default is 6 sides.
+     * @returns {Number} the result of the die roll.
+     */
+    rollDie : function(sides) {
+        if (!sides) sides = 6;
+        with(Math) return 1 + floor(random() * sides);
+    },
+    
+    /**
+     * Roll a number of dice.
+     * 
+     * @param {Number} number the number of dice to be rolled
+     * @param {Number} sides the number of sides on each die.
+     * @returns {Number} the result of the dice roll.
+     */
+    rollDice: function(number, sides) {
+        var total = 0;
+        while(number-- > 0) total += this.rollDie(sides);
+        return total;
+    }
+};
+
+GAME.namespace("utils").tables = {
+    getDamageBonus: function(sty, sto) {
+        var medel = Math.ceil((sty + sto)/2);
+        if (medel < 17) {
+            return 0;
+        }
+        if (medel >= 17 && medel <= 20) {
+            return [1, 4];
+        }
+        if (medel >= 21 && medel <= 25) {
+            return [1, 6];
+        }
+        if (medel >= 26 && medel <= 30) {
+            return [1, 10];
+        }
+        if (medel >= 31 && medel <= 40) {
+            return [2, 6];
+        }
+        if (medel >= 41 && medel <= 50) {
+            return [3, 6];
+        }
+        
+    }
 };

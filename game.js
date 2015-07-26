@@ -35,19 +35,17 @@ $(function() {
             for (i; i < length; i++) {
                 tempObj = GAME.objects[i];
                 if (GAME.selected !== null && tempObj === GAME.selected) {
-                    // sel = tempObj;
-                    tempObj.select();
+                    sel = tempObj;
+                    // tempObj.select();
                 } else {
                     tempObj.deselect();
                 }
             }
-//            if (sel) {
-//                sel.select();
-//                if (sel.type === "hero") {
-//                    m = sel.movement;
-//                    sidebar.setMoveData(m.ffString());
-//                }
-//            }
+            // The selected character must be selected last in order to preserve the markings
+            // on attacked targets.
+            if (sel) {
+                sel.select();
+            }
         },
         
         rebuildPassableGrid : function() {
@@ -59,6 +57,38 @@ $(function() {
                 c = tempObj.getCoordinates();
                 GAME.currentMapPassableTiles[c.y][c.x] = 1;
             }
+        },
+        
+        nextRound : function() {
+            // Clear selected
+            GAME.selected = null;
+            
+            GAME.combat.performCombat();
+            // Has any triggers been activated? (traps for example)
+            // Has opponent acted yet in this round?
+            // No -> perform opponent actions
+            // 
+            // Resolve combat
+            
+            // if close combat attack in smi order
+            // - if target has cc weapon/shield
+            //      - if target has not attacked
+            //            -> choose between attack and parry
+            
+            // Resolve initiative (1d10) for each side; highest wins
+            
+            // If opponent wins -> perform opponent actions  
+            
+            // Reset all used movement
+            var i = 0, length = GAME.objects.length, tempObj = null;
+            for (i; i < length; i++) {
+                tempObj = GAME.objects[i];
+                tempObj.movement.reset();
+                tempObj.deselect();
+                tempObj.target = null;
+                
+            }
+            sidebar.refresh();
         }
     };
     
@@ -68,6 +98,13 @@ $(function() {
     // loaded.
     sidebar.init();
     mouse.init();
+    $(".overlay-content a").click(function (ev) {
+        $(".overlay-bg").hide();
+    });
+    
+    $("#nextRound").click(function (ev) {
+        GAME.nextRound();
+    });
 
     // Call the loadMap function. The callback passed
     // is a function that scrolls each viewport according
@@ -77,7 +114,7 @@ $(function() {
         GAME.floor = tileScrollers[0]; // Floor from tmx-file
         GAME.walls = tileScrollers[1]; // Walls from tmx-file
         GAME.staticObjects = tileScrollers[2];
-        console.log(tileScrollers[2]);
+        // console.log(tileScrollers[2]);
 
         // Create a matrix with obstructed tiles (only 'wall' tiles
         // are counted at this point
@@ -110,7 +147,7 @@ $(function() {
         char.draw(6, 9);
         GAME.objects.push(char);
         
-        var villian = GAME.npc.NPC(GAME.characterData.troll("mage"));
+        var villian = GAME.npc.NPC(GAME.characterData.troll("mage", "Trollur Flams"));
         villian.draw(14, 12);
         GAME.objects.push(villian);
         
