@@ -24,30 +24,26 @@ GAME.characterData = {
         ],
         movement : 10,
         stats : {
-            sty: (GAME.utils.dice.rollDice(2,6) + 3),
-            fys: (GAME.utils.dice.rollDice(3,6)),
-            sto: (GAME.utils.dice.rollDice(2,6) + 2),
-            int: (GAME.utils.dice.rollDice(4,6)),
-            psy: (GAME.utils.dice.rollDice(3,6)),
-            smi: (GAME.utils.dice.rollDice(3,6) + 3),
-            kar: (GAME.utils.dice.rollDice(3,6) + 2)
-        },
-        hitPoints : function() {
-            return (Math.ceil((this.stats.sto + this.stats.fys) / 2));
+            sty: "2t6+3",
+            fys: "3t6",
+            sto: "2t6+2",
+            int: "4t6",
+            psy: "3t6",
+            smi: "3t6+3",
+            kar: "3t6+2"
         },
         type: "hero",
         race: "Alv",
         trade: "Krigare",
         name: "Ladogas",
-        armor: {
-            type: "Ringbrynja",
-            abs: 4
-        },
+        armor: [
+            0
+        ],
         weapons: [
             {
-                name: "Bredsvärd",
+                type: 0,
                 attack: 70,
-                parry: 60
+                defence: 70
             }
         ]
     },
@@ -62,27 +58,27 @@ GAME.characterData = {
             imgArray : [subType[type]],
             movement : 10,
             stats : {
-                sty: (GAME.utils.dice.rollDice(3,6) + 6),
-                fys: (GAME.utils.dice.rollDice(2,6) + 6),
-                sto: (GAME.utils.dice.rollDice(3,6) + 6),
-                int: (GAME.utils.dice.rollDice(2,6) + 3),
-                psy: (GAME.utils.dice.rollDice(3,6)),
-                smi: (GAME.utils.dice.rollDice(3,6)),
+                sty: "3t6+6",
+                fys: "2t6+6",
+                sto: "3t6+6",
+                int: "2t6+3",
+                psy: "3t6",
+                smi: "3t6",
                 kar: 0
-            },
-            hitPoints : function() {
-                return (Math.ceil((this.stats.sto + this.stats.fys) / 2));
-            },
-            sb: function() {
-                return GAME.utils.tables.getDamageBonus(this.stats.sty, this.stats.sto);
             },
             type: "npc",
             race: "Grottroll",
             name: (typeof theName === "undefined" ? "" : theName),
-            armor: {
-                type: "hud",
-                abs: 3
-            }
+            armor: [
+                1
+            ],
+            weapons: [
+                {
+                    type: 1,
+                    attack: 70,
+                    defence: 70
+                }
+            ]
         };
         return object;
     }

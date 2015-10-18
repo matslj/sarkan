@@ -1,3 +1,11 @@
+/**
+ * This 'class' returns an object which represents an adventurer
+ * character in the game. The object created by this function extends
+ * the GAME.sprite.DHTMLSprite-object.
+ * 
+ * @param {type} params
+ * @returns {GAME.sprite.DHTMLSprite.that|DHTMLSprite.that|GAME.namespace.Adventurer.that}
+ */
 GAME.namespace("adventurer").Adventurer = function (params) {
 
     var that = GAME.sprite.DHTMLSprite(params);

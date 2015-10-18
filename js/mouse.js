@@ -35,8 +35,8 @@ var mouse = {
                         // Attack
                         var coord = GAME.selected.getCoordinates();
                         // console.log("x: " + coord.x + ", " + coord.y);
-                        if (mouse.checkIfAdjacent(coord.x, coord.y)) {
-                            GAME.selected.attack(clickedItem, true);
+                        if (GAME.utils.game.checkIfAdjacent(mouse.gridX, mouse.gridY, coord.x, coord.y)) {
+                            GAME.selected.markAttacking(clickedItem, true);
                         }
                     }
                 }
@@ -81,12 +81,6 @@ var mouse = {
 //                }
 //            }
 //        }
-    },
-    checkIfAdjacent: function (x, y) {
-        var diffX = 0, diffY = 0;
-        diffX = Math.abs(mouse.gridX - x);
-        diffY = Math.abs(mouse.gridY - y);
-        return diffX <= 1 && diffY <= 1;
     },
     calculateGameCoordinates: function (mX, mY) {
         // At the moment no offset is used

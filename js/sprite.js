@@ -50,9 +50,9 @@ GAME.sprite = {
      */
     DHTMLSprite : function(params) {
         
-        // The elementBase represents the square that the character stands on.
+        // The elementBase represents the square that the object rest on.
         var $elementBase = GAME.SYS_spriteParams.$drawTarget.append('<div/>').find(':last'), // this contains 'grid' cell for the element to be drawn
-            // The element is the actual character standing on the elementBase (se above).
+            // The element is the actual object standing on the elementBase (se above).
             $element =  $elementBase.append('<div/>').find(':last'), // this contains the element to be drawn
             // This is a shortcut to the style-property of the elementBase
             elemBaseStyle = $elementBase[0].style,
@@ -70,6 +70,7 @@ GAME.sprite = {
                 name : params.name,
                 trade: params.trade,
                 stats: params.stats,
+                weapons: params.weapons,
                 getTitle : function() {
                     return this.name ? this.name : this.race;
                 }
@@ -199,7 +200,7 @@ GAME.sprite = {
             * @param {type} finalizeAttack if true th
             * @returns {undefined}
             */
-            attack : function(theTarget, finalizeAttack) {
+            markAttacking : function(theTarget, finalizeAttack) {
                 if(that.movement.isMaxHalfUsed()) {
                     if (target === null) {
                         // attackLocked = typeof finalizeAttack !== "undefined" ? finalizeAttack : false;
@@ -211,7 +212,7 @@ GAME.sprite = {
                     GAME.utils.showErrorMsg("Mer än hälften av förflyttningen är förbrukad och då är inte anfall möjligt.");
                 }
             },
-            unAttack : function() {
+            unMarkAttacking: function() {
                 if (that.target) {
                     that.target.deselect();
                 }

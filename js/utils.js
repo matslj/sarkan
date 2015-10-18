@@ -329,7 +329,46 @@ GAME.namespace("utils").dice = {
         var total = 0;
         while(number-- > 0) total += this.rollDie(sides);
         return total;
+    },
+    
+    parseDiceString: function(diceString) {
+        if (diceString === 0) {
+            return null;
+        }
+        var regEx = /([0-9]+)t([0-9]+)\+?([0-9]*)/i;
+        var matches = diceString.match(regEx);
+        //console.log(diceString + " - matches: " + matches);
+        
+        //var adder = matches[]
+        return {
+            nr: parseInt(matches[1], 10),
+            type: parseInt(matches[2], 10),
+            add: matches[3] ? parseInt(matches[3],10) : 0
+        };
     }
+};
+
+GAME.namespace("utils").game = {
+    /**
+     * Checks if a grid coordinate is adjacent
+     * 
+     * @param {type} currX the reference grid coordinates x position
+     * @param {type} currY the reference grid coordinates y position
+     * @param {type} x the x position of the coordinate to be tested for adjacency
+     * @param {type} y the y position of the coordinate to be tested for adjacency
+     * @returns {Boolean}
+     */
+    checkIfAdjacent: function (currX, currY, x, y) {
+        var diffX = 0, diffY = 0;
+        diffX = Math.abs(currX - x);
+        diffY = Math.abs(currY - y);
+        return diffX <= 1 && diffY <= 1;
+    },
+    
+    isNumeric: function(n) {
+        return !isNaN(parseFloat(n)) && isFinite(n);
+    }
+    
 };
 
 GAME.namespace("utils").tables = {

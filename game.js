@@ -79,7 +79,7 @@ $(function() {
             
             // If opponent wins -> perform opponent actions  
             
-            // Reset all used movement
+            // Reset all used movement and deselect all selected game objects
             var i = 0, length = GAME.objects.length, tempObj = null;
             for (i; i < length; i++) {
                 tempObj = GAME.objects[i];
@@ -143,17 +143,21 @@ $(function() {
         GAME.walls.draw(scrollX, scrollY);
         GAME.staticObjects.draw(scrollX, scrollY, true);
         
-        var char = GAME.adventurer.Adventurer(GAME.characterData.elf);
-        char.draw(6, 9);
-        GAME.objects.push(char);
+        var gchar = GAME.character.loadCharacter(GAME.characterData.elf);
+        console.log(gchar.stats);
+        console.log(gchar.hitPoints());
         
-        var villian = GAME.npc.NPC(GAME.characterData.troll("mage", "Trollur Flams"));
-        villian.draw(14, 12);
-        GAME.objects.push(villian);
-        
-        villian = GAME.npc.NPC(GAME.characterData.troll("fighter"));
-        villian.draw(8,13);
-        GAME.objects.push(villian);
+//        var char = GAME.adventurer.Adventurer(GAME.characterData.elf);
+//        char.draw(6, 9);
+//        GAME.objects.push(char);
+//        
+//        var villian = GAME.npc.NPC(GAME.characterData.troll("mage", "Trollur Flams"));
+//        villian.draw(14, 12);
+//        GAME.objects.push(villian);
+//        
+//        villian = GAME.npc.NPC(GAME.characterData.troll("fighter"));
+//        villian.draw(8,13);
+//        GAME.objects.push(villian);
 
         // GAME.adventurers.paintObstructedTiles();
     });
