@@ -27,11 +27,11 @@ var mouse = {
         } else { // Player right clicked
             // Handle actions like attacking and movement of selected units
             if (GAME.selected) {
-                if (GAME.selected.type === "hero") {
+                if (GAME.selected.character.type === "hero") {
                     if (!clickedItem) {
                         // Move
                         GAME.selected.moveTo(mouse.gridX, mouse.gridY);
-                    } else if (clickedItem.type === "npc") {
+                    } else if (clickedItem.character.type === "npc") {
                         // Attack
                         var coord = GAME.selected.getCoordinates();
                         // console.log("x: " + coord.x + ", " + coord.y);
@@ -105,7 +105,7 @@ var mouse = {
                         var coord = GAME.selected.getCoordinates();
                         var itemUnderPointer = mouse.itemUnderMouse();
                         if (itemUnderPointer === null) {
-                            if (GAME.selected.type === "hero") {
+                            if (GAME.selected.character.type === "hero") {
 //                                GAME.selected.unAttack();
                                 GAME.selected.markMove(mouse.gridX, mouse.gridY);
                             }

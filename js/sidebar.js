@@ -84,41 +84,40 @@ var sidebar = {
         sidebar.buttons.move = false;
         
         if (GAME.selected) {            
-            if (GAME.selected.type === "npc") {
+            if (GAME.selected.character.type === "npc") {
                 $("#npc").show();
                 
-                $("#npc .header").html(GAME.selected.characterData.getTitle());
+                $("#npc .header").html(GAME.selected.character.getTitle());
                 
                 // Update movement points
-                $("#npc div.ff").html(GAME.selected.movement.ffString());
+                $("#npc div.ff").html(GAME.selected.character.movement.ffString());
                 
                 // Update movement points
-                $("#npc div.hp").html(GAME.selected.getHpString());
+                $("#npc div.hp").html(GAME.selected.character.getHpString());
             }
             
-            if (GAME.selected.type === "hero") {
+            if (GAME.selected.character.type === "hero") {
                 $("#hero").show();
                 
-                $("#hero div.right div.namn").html(GAME.selected.characterData.name);
-                $("#hero div.right div.ras").html(GAME.selected.characterData.race);
-                $("#hero div.right div.yrke").html(GAME.selected.characterData.trade);
+                $("#hero div.right div.namn").html(GAME.selected.character.name);
+                $("#hero div.right div.ras").html(GAME.selected.character.race);
+                $("#hero div.right div.yrke").html(GAME.selected.character.trade);
                 
                 // Update movement points
-                $("#ffEdit").html(GAME.selected.movement.ffString());
+                $("#ffEdit").html(GAME.selected.character.movement.ffString());
                 
+                $("#hero table td.sty").html(GAME.selected.character.stats.sty);
+                $("#hero table td.fys").html(GAME.selected.character.stats.fys);
+                $("#hero table td.sto").html(GAME.selected.character.stats.sto);
+                $("#hero table td.int").html(GAME.selected.character.stats.int);
+                $("#hero table td.psy").html(GAME.selected.character.stats.psy);
+                $("#hero table td.smi").html(GAME.selected.character.stats.smi);
+                $("#hero table td.kar").html(GAME.selected.character.stats.kar);
                 
-                $("#hero table td.sty").html(GAME.selected.characterData.stats.sty);
-                $("#hero table td.fys").html(GAME.selected.characterData.stats.fys);
-                $("#hero table td.sto").html(GAME.selected.characterData.stats.sto);
-                $("#hero table td.int").html(GAME.selected.characterData.stats.int);
-                $("#hero table td.psy").html(GAME.selected.characterData.stats.psy);
-                $("#hero table td.smi").html(GAME.selected.characterData.stats.smi);
-                $("#hero table td.kar").html(GAME.selected.characterData.stats.kar);
+                // Update health points
+                $("#kpEdit").html(GAME.selected.character.getHpString());
                 
-                // Update movement points
-                $("#kpEdit").html(GAME.selected.getHpString());
-                
-                if (GAME.selected.movement.used < GAME.selected.movement.max) {
+                if (GAME.selected.character.movement.used < GAME.selected.character.movement.max) {
                     $("#sidebarButtons input[type='button'] ").attr("disabled", false);
                     // When a hero is selected move is default
                     sidebar.buttons.move = true;

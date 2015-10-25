@@ -83,7 +83,7 @@ $(function() {
             var i = 0, length = GAME.objects.length, tempObj = null;
             for (i; i < length; i++) {
                 tempObj = GAME.objects[i];
-                tempObj.movement.reset();
+                tempObj.character.movement.reset();
                 tempObj.deselect();
                 tempObj.target = null;
                 
@@ -143,21 +143,25 @@ $(function() {
         GAME.walls.draw(scrollX, scrollY);
         GAME.staticObjects.draw(scrollX, scrollY, true);
         
-        var gchar = GAME.character.loadCharacter(GAME.characterData.elf);
-        console.log(gchar.stats);
-        console.log(gchar.hitPoints());
+//        var gchar = GAME.character.loadCharacter(GAME.characterData.elf);
+//        
+//        console.log("DamageRoll: " + gchar.weapons[0].rollForDamage());
+//        console.log("DamageRoll: " + gchar.weapons[0].rollForDamage());
+//        console.log("DamageRoll: " + gchar.weapons[0].rollForDamage());
+//        
+//        gchar.toString();
         
-//        var char = GAME.adventurer.Adventurer(GAME.characterData.elf);
-//        char.draw(6, 9);
-//        GAME.objects.push(char);
-//        
-//        var villian = GAME.npc.NPC(GAME.characterData.troll("mage", "Trollur Flams"));
-//        villian.draw(14, 12);
-//        GAME.objects.push(villian);
-//        
-//        villian = GAME.npc.NPC(GAME.characterData.troll("fighter"));
-//        villian.draw(8,13);
-//        GAME.objects.push(villian);
+        var char = GAME.adventurer.Adventurer(GAME.character.loadCharacter(GAME.characterData.elf));
+        char.draw(6, 9);
+        GAME.objects.push(char);
+        
+        var villian = GAME.npc.NPC(GAME.character.loadCharacter(GAME.characterData.troll("mage", "Trollur Flams")));
+        villian.draw(14, 12);
+        GAME.objects.push(villian);
+        
+        villian = GAME.npc.NPC(GAME.character.loadCharacter(GAME.characterData.troll("fighter")));
+        villian.draw(8,13);
+        GAME.objects.push(villian);
 
         // GAME.adventurers.paintObstructedTiles();
     });

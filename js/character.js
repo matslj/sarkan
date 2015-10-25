@@ -1,13 +1,56 @@
+/**
+ * This represents a character (hero or npc) in the game, with all their skills
+ * stats, inventory, etc.
+ * <p>
+ * In order to create a new character: run the loadCharacter-function (with 
+ * characterspecific data as parameter). This method returns an object
+ * representing the character. Properties and methods of this object:
+ * <ul>
+ * <li>type - type of character (hero or npc)
+ * <li>race - race of character
+ * <li>name - name of character (optional)
+ * <li>movement - the speed by which the character moves
+ * <li>imgArray - an array of images which are used to display the character
+ * <li>trade - the trade of the character (fighter, monk, thief, wizard, etc)
+ * <li>stats - the basic characteristics of the characters (smi, sty, kar, etc)
+ * <li>(function) hitPoints - the total number of hitpoints
+ * <li>(function) sb - the damage bonus, this bonus is added to a weapons damage in close combat
+ * <li>armor - an array of the armor worn by the character.
+ * <li>(function) totalAbs - total absorbationvalue of the armor
+ * <li>weapons - a list of weapons worn
+ * </ul>
+ * 
+ * @type type
+ */
 GAME.character = {
 
     loadCharacter : function(characterData) {
+        
+        var hp = -9999,
+            alive = true;
+        
         var char = {
             type : characterData.type,
             race : characterData.race,
             name : characterData.name,
-            movement: characterData.movement,
             imgArray: characterData.imgArray,
             trade: characterData.trade,
+            
+            movement : {
+                max : characterData.movement,
+                half : (characterData.movement/2 >> 0),
+                used : 0,
+                ffString : function() {
+                    return this.used + " / " + this.max;
+                },
+                isMaxHalfUsed : function() {
+                    return this.used <= this.half;
+                },
+                reset : function () {
+                    this.used = 0;
+                }
+            },
+            
             stats : (function(stats) {
                 var copy = jQuery.extend({}, stats);
                 for (var property in copy) {
@@ -20,35 +63,107 @@ GAME.character = {
                 }
                 return copy;
             }(characterData.stats)),
-            hitPoints : function() {
+            
+            getHitPoints : function() {
                 return (Math.ceil((this.stats.sto + this.stats.fys) / 2));
             },
-            sb: function() {
+            
+            getCurrentHitPoints: function() {
+                if (hp === -9999 && alive === true) {
+                    hp = this.getHitPoints();
+                }
+                return hp;
+            },
+            
+            heal: function(healingPoints) {
+                if (alive === true) {
+                    hp += healingPoints;
+                    if (hp > this.getHitPoints()) {
+                        hp = this.getHitPoints();
+                    }
+                }
+            },
+            
+            getHpString: function() {
+                return this.getCurrentHitPoints() + " / " + this.getHitPoints();
+            },
+            
+            setDamage: function(damage) {
+                var afterAbs = this.getTotalAbs() - damage;
+                if (afterAbs < 0) {
+                    hp = this.getCurrentHitPoints() + afterAbs;
+                    alive = false;
+                }
+            },
+            
+            getSb: function() {
                 return GAME.utils.tables.getDamageBonus(this.stats.sty, this.stats.sto);
             },
+            
+            getTitle : function() {
+                return this.name ? this.name : this.race;
+            },
+            
             armor: (function (armor) {
                 var arms = [];
                 for (var i = 0; i < armor.length; i++) {
-                    arms.push(Game.armorData[armor[i]]);
+                    arms.push(GAME.armorData[armor[i]]);
                 }
                 return arms;
             }(characterData.armor)),
-            totalAbs : function() {
+            
+            getTotalAbs : function() {
                 var total = 0;
                 for (var i = 0; i < this.armor.length; i++) {
                     total += this.armor[i].abs;
                 }
                 return total;
             },
-            // ****** IN PROGRESS *******
+            
             weapons : (function(dWeapons) {
-                var obj = {};
-                obj.weapons = [];
+                var weapons = [];
                 for (var i = 0; i < dWeapons.length; i++) {
-                    arms.push(Game.weaponData[dWeapons[i]]);
+                    var wData = GAME.weaponData[dWeapons[i].type];
+                    //console.log("wData: "+wData + " dWeapons: " + dWeapons[i].type);
+                    var target = $.extend({}, wData, dWeapons[i]);
+                    target.rollForDamage = (function(dmgString) {
+                        var parsedDmg = GAME.utils.dice.parseDiceString(dmgString);
+                        return function() {
+                            return GAME.utils.dice.rollDice(parsedDmg.nr, parsedDmg.type) + parsedDmg.add;
+                        }
+                    }(wData.damage));
+                    weapons.push(target);
                 }
-                return arms;
-            }(characterData.weapons))
+                return weapons;
+            }(characterData.weapons)),
+            
+            toString : function() {
+                var print = console.log;
+                
+                print("*** Printing character data ***");
+                print("Typ: " + this.type);
+                print("Ras: " + this.race);
+                print("Namn: " + this.name);
+                print("Yrke: " + this.trade);
+                print("Förflyttning: " + this.movement.max);
+                print("Kroppspoäng: " + this.getHitPoints());
+                print("Skadebonus: " + this.getSb());
+                
+                print("-- Grundegenskaper --")
+                for (var stat in this.stats) {
+                    if (this.stats.hasOwnProperty(stat)) {
+                        print(stat + " : " + this.stats[stat]);
+                    }
+                }
+                print("-- Rustning --")
+                for (var i = 0; i < this.armor.length; i++) {
+                    print(this.armor[i].name + " abs: " + this.armor[i].abs);
+                }
+                print("-- Vapen --")
+                for (var i = 0; i < this.weapons.length; i++) {
+                    print(this.weapons[i].name + " attack: " + this.weapons[i].attack + " parera: " + this.weapons[i].defence + " skada: " + this.weapons[i].damage);
+                }
+            }
        };
        return char;
    }

@@ -16,7 +16,7 @@ GAME.combat = {
         // Sort the combatants using their respective SMI (dexterity) value
         i = 0;
         for (i; i < ilength; i++) {
-            for(j = i - 1; j>-1 && combatOrder[j].characterData.stats.smi > combatOrder[i].characterData.stats.smi; j--) {
+            for(j = i - 1; j>-1 && combatOrder[j].character.stats.smi > combatOrder[i].character.stats.smi; j--) {
                 tempObj = combatOrder[j+1];
                 combatOrder[j+1] = combatOrder[j];
                 combatOrder[j] = tempObj;
@@ -28,7 +28,7 @@ GAME.combat = {
         for (i = ilength - 1; i>-1; i--) {
             tempObj = combatOrder[i];
             
-            console.log(tempObj.characterData.getTitle() + " smi: " + tempObj.characterData.stats.smi);
+            console.log(tempObj.character.getTitle() + " smi: " + tempObj.character.stats.smi);
         }
     }
     

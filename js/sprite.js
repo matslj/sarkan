@@ -48,10 +48,11 @@ GAME.sprite = {
      * @param {type} params
      * @returns {DHTMLSprite.that} an DHTMLSprite-instance
      */
-    DHTMLSprite : function(params) {
+    DHTMLSprite : function(aCharacter) {
         
-        // The elementBase represents the square that the object rest on.
-        var $elementBase = GAME.SYS_spriteParams.$drawTarget.append('<div/>').find(':last'), // this contains 'grid' cell for the element to be drawn
+        var character = aCharacter,
+            // The elementBase represents the square that the object rest on.
+            $elementBase = GAME.SYS_spriteParams.$drawTarget.append('<div/>').find(':last'), // this contains 'grid' cell for the element to be drawn
             // The element is the actual object standing on the elementBase (se above).
             $element =  $elementBase.append('<div/>').find(':last'), // this contains the element to be drawn
             // This is a shortcut to the style-property of the elementBase
@@ -61,41 +62,11 @@ GAME.sprite = {
             // The processed image-array of the character. In the bottom of
             // the array consists of the naked character and the layers above
             // represents accessories as trousers, sword, shield, etc.
-            backgroundCSS = this.processMultipleBackgrounds(params.imgArray),
+            backgroundCSS = this.processMultipleBackgrounds(character.imgArray),
             unitX = 0,
             unitY = 0,
-            staticCharData = {
-                type : params.type,
-                race : params.race,
-                name : params.name,
-                trade: params.trade,
-                stats: params.stats,
-                weapons: params.weapons,
-                getTitle : function() {
-                    return this.name ? this.name : this.race;
-                }
-            },
-            hitPoints = {
-                current: params.hitPoints(),
-                max: params.hitPoints()
-            },
             mathFloor = Math.floor,
             target = null; // The target of an attack. There can be only one victim/turn.
-
-        var movement = {
-            max : params.movement,
-            half : (params.movement/2 >> 0),
-            used : 0,
-            ffString : function() {
-                return this.used + " / " + this.max;
-            },
-            isMaxHalfUsed : function() {
-                return this.used <= this.half;
-            },
-            reset : function () {
-                this.used = 0;
-            }
-        };
 
         var movePath = {
             $selected : null, // the aStar path (below) as a series of squares (divs) in a container element (div)
@@ -131,10 +102,8 @@ GAME.sprite = {
             border: "1px solid transparent"
         });
         var that = {
-            movement: movement,
             movePath: movePath,
-            type: staticCharData.type,
-            characterData: staticCharData,
+            character: character,
             target: target,
             // x and y in tile unit
             draw: function(x, y) {
@@ -175,23 +144,7 @@ GAME.sprite = {
             },
             markAttackedBy: function() {
                 elemBaseStyle.border = "1px solid red";
-            },
-            wound: function(damage) {
-                hitPoints.current -= damage;
-                if (hitPoints.current < 0) {
-                    hitPoints.current = 0;
-                    destroy();
-                }
-            },
-            heal: function(hp) {
-                hitPoints.current += hp;
-                if (hitPoints.current > hitPoints.max) {
-                    hitPoints.current = hitPoints.max;
-                }
-            },
-            getHpString: function() {
-                return hitPoints.current + " / " + hitPoints.max;
-            },
+            },            
             /**
             * Attack an NPC.
             * 
@@ -201,7 +154,7 @@ GAME.sprite = {
             * @returns {undefined}
             */
             markAttacking : function(theTarget, finalizeAttack) {
-                if(that.movement.isMaxHalfUsed()) {
+                if(character.movement.isMaxHalfUsed()) {
                     if (target === null) {
                         // attackLocked = typeof finalizeAttack !== "undefined" ? finalizeAttack : false;
                         target = theTarget;
