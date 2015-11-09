@@ -93,7 +93,13 @@ GAME.character = {
                 if (afterAbs < 0) {
                     hp = this.getCurrentHitPoints() + afterAbs;
                     alive = false;
+                    return Math.abs(afterAbs);
                 }
+                return 0; // return damage dealt
+            },
+            
+            isAlive: function() {
+                return alive;
             },
             
             getSb: function() {
@@ -129,7 +135,8 @@ GAME.character = {
                     target.rollForDamage = (function(dmgString) {
                         var parsedDmg = GAME.utils.dice.parseDiceString(dmgString);
                         return function() {
-                            return GAME.utils.dice.rollDice(parsedDmg.nr, parsedDmg.type) + parsedDmg.add;
+                            var sb = (char.getSb() ? GAME.utils.dice.rollDice(char.getSb()[0], char.getSb()[1]) : 0);
+                            return GAME.utils.dice.rollDice(parsedDmg.nr, parsedDmg.type) + parsedDmg.add + sb;
                         }
                     }(wData.damage));
                     weapons.push(target);
@@ -137,17 +144,30 @@ GAME.character = {
                 return weapons;
             }(characterData.weapons)),
             
+            selectedWeapon : function() {
+                return this.weapons[0];
+            },
+            
             toString : function() {
-                var print = console.log;
+                var print = function(string) {
+                        if (typeof string === "undefined") {
+                            string = "";
+                        }
+                        txt = txt + string + "\n";
+                    },
+                    txt = '';
                 
                 print("*** Printing character data ***");
-                print("Typ: " + this.type);
-                print("Ras: " + this.race);
-                print("Namn: " + this.name);
-                print("Yrke: " + this.trade);
+                print();
+                print("Typ:          " + this.type);
+                print("Ras:          " + this.race);
+                print("Namn:         " + this.name);
+                print("Yrke:         " + this.trade);
                 print("Förflyttning: " + this.movement.max);
-                print("Kroppspoäng: " + this.getHitPoints());
-                print("Skadebonus: " + this.getSb());
+                print("Kroppspoäng:  " + this.getHitPoints());
+                print("Skadebonus:   " + this.getSb());
+                
+                print();
                 
                 print("-- Grundegenskaper --")
                 for (var stat in this.stats) {
@@ -155,14 +175,31 @@ GAME.character = {
                         print(stat + " : " + this.stats[stat]);
                     }
                 }
+                print();
                 print("-- Rustning --")
                 for (var i = 0; i < this.armor.length; i++) {
                     print(this.armor[i].name + " abs: " + this.armor[i].abs);
                 }
+                print();
                 print("-- Vapen --")
                 for (var i = 0; i < this.weapons.length; i++) {
                     print(this.weapons[i].name + " attack: " + this.weapons[i].attack + " parera: " + this.weapons[i].defence + " skada: " + this.weapons[i].damage);
+                    print("Example dmg roll: " + this.weapons[i].rollForDamage());
+                    print("Example dmg roll: " + this.weapons[i].rollForDamage());
+                    print("Example dmg roll: " + this.weapons[i].rollForDamage());
+                    print("Example dmg roll: " + this.weapons[i].rollForDamage());
+                    print("Example dmg roll: " + this.weapons[i].rollForDamage());
+                    print("Example dmg roll: " + this.weapons[i].rollForDamage());
+                    print("Example dmg roll: " + this.weapons[i].rollForDamage());
+                    print("Example dmg roll: " + this.weapons[i].rollForDamage());
+                    print("Example dmg roll: " + this.weapons[i].rollForDamage());
+                    print("Example dmg roll: " + this.weapons[i].rollForDamage());
+                    print("Example dmg roll: " + this.weapons[i].rollForDamage());
+                    print("Example dmg roll: " + this.weapons[i].rollForDamage());
+                    print("Example dmg roll: " + this.weapons[i].rollForDamage());
                 }
+                
+                return txt;
             }
        };
        return char;

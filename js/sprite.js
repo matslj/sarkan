@@ -66,7 +66,7 @@ GAME.sprite = {
             unitX = 0,
             unitY = 0,
             mathFloor = Math.floor,
-            target = null; // The target of an attack. There can be only one victim/turn.
+            targetI = null; // The target of an attack. There can be only one victim/turn.
 
         var movePath = {
             $selected : null, // the aStar path (below) as a series of squares (divs) in a container element (div)
@@ -104,7 +104,7 @@ GAME.sprite = {
         var that = {
             movePath: movePath,
             character: character,
-            target: target,
+            target: targetI,
             // x and y in tile unit
             draw: function(x, y) {
                 unitX = x;
@@ -129,14 +129,14 @@ GAME.sprite = {
             },
             select: function() {
                 elemBaseStyle.border = "1px solid yellow";
-                if (target) {
-                    target.markAttackedBy();
+                if (this.target) {
+                    this.target.markAttackedBy();
                 }
             },
             deselect: function() {
                 elemBaseStyle.border = "1px solid transparent";
-                if (target) {
-                    target.deselect();
+                if (this.target) {
+                    this.target.deselect();
                 }
             },
             getCssAsObject: function() {
@@ -155,10 +155,10 @@ GAME.sprite = {
             */
             markAttacking : function(theTarget, finalizeAttack) {
                 if(character.movement.isMaxHalfUsed()) {
-                    if (target === null) {
+                    if (this.target === null) {
                         // attackLocked = typeof finalizeAttack !== "undefined" ? finalizeAttack : false;
-                        target = theTarget;
-                        target.markAttackedBy();
+                        this.target = theTarget;
+                        this.target.markAttackedBy();
                         that.movePath.remove();
                     }
                 } else {
@@ -171,8 +171,29 @@ GAME.sprite = {
                 }
                 that.target = null;
             },
+            printDamage: function(damage) {
+                //console.log("sssssssssssssssssssssssssss");
+                var dmg = this.character.setDamage(damage);
+                console.log("damage: " + dmg);
+                var $el  = $element.append('<div/>').find(':last');
+                $el.append('<span style="display: inline-block; text-align: center; width: 100%; line-height: 32px; vertical-align: middle;">' + dmg + '</span>');
+                $el.css({
+                    fontSize: '12px',
+                    fontWeight: 'bold',
+                    position: 'absolute',
+                    color: '#FFF',
+                    width: GAME.tileWidth,
+                    height: GAME.tileHeight,
+                    backgroundColor: 'rgba(255,0,0,0.3)',
+                    left: '0px',
+                    top: '0px'
+                });
+//                setTimeout(function() {
+//                    $el.remove();
+//                }, 1000);
+            },
             isLocked : function() {
-                return target !== null;
+                return this.target !== null;
             }
         };
         return that;

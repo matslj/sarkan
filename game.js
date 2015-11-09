@@ -158,6 +158,7 @@ $(function() {
         var villian = GAME.npc.NPC(GAME.character.loadCharacter(GAME.characterData.troll("mage", "Trollur Flams")));
         villian.draw(14, 12);
         GAME.objects.push(villian);
+        //console.log(villian.character.toString());
         
         villian = GAME.npc.NPC(GAME.character.loadCharacter(GAME.characterData.troll("fighter")));
         villian.draw(8,13);
