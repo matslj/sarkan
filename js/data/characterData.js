@@ -19,7 +19,7 @@ GAME.characterData = {
             {x:8, y:36},  // Sword
             {x:2, y:34},  // Pants
             {x:15, y:35}, // Helmet
-            {x:6, y:33},  // Chainmail
+            {x:6, y:32},  // Chainmail
             {x:0, y:31}   // The character
         ],
         movement : 10,
@@ -42,7 +42,41 @@ GAME.characterData = {
         weapons: [
             {
                 type: 0,
-                attack: 70,
+                attack: 85,
+                defence: 70
+            }
+        ]
+    },
+    human : {
+        // Background images; the char + all clothes and gear
+        imgArray : [
+            {x:51, y:35},  // Sword
+            {x:4, y:34},  // Pants
+            {x:10, y:35}, // Helmet
+            {x:9, y:33},  // Chainmail
+            {x:8, y:31}   // The character
+        ],
+        movement : 10,
+        stats : {
+            sty: "18",
+            fys: "3t6",
+            sto: "15",
+            int: "3t6",
+            psy: "3t6",
+            smi: "3t6",
+            kar: "3t6"
+        },
+        type: "hero",
+        race: "Människa",
+        trade: "Krigare",
+        name: "Cromos",
+        armor: [
+            3
+        ],
+        weapons: [
+            {
+                type: 2,
+                attack: 85,
                 defence: 70
             }
         ]
@@ -75,8 +109,8 @@ GAME.characterData = {
             weapons: [
                 {
                     type: 1,
-                    attack: 70,
-                    defence: 70
+                    attack: 65,
+                    defence: 50
                 }
             ]
         };

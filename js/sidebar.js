@@ -10,6 +10,8 @@ var sidebar = {
         search: false,
         stealth: false,
     },
+    messages: [],
+    messagesArraySize: 10,
     /**
      * Handles the hinding/showing of sidebar panels and buttons.
      * Should be called when a new game object has been
@@ -77,6 +79,15 @@ var sidebar = {
     setMoveData: function (moveData) {
         $("#ffEdit").html(moveData);
     },
+    addMessage: function(message) {
+        if (this.messages.length === this.messagesArraySize) {
+            this.messages.shift();
+        }
+        this.messages.push(message);
+    },
+    clearMessages: function () {
+        this.messages = [];
+    },
     refresh : function() {
         // Disable all
         $("#sidebarButtons input[type='button'] ").attr("disabled", true);
@@ -122,6 +133,13 @@ var sidebar = {
                     // When a hero is selected move is default
                     sidebar.buttons.move = true;
                 } 
+            }
+        } else {
+            $("#log").show();
+            var $ul = $("#log ul");
+            $ul.html("");
+            for (var i = 0; i < this.messages.length; i++) {
+                $ul.append('<li>' + this.messages[i] + '</li>');
             }
         }
     }

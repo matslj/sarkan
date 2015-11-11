@@ -6,5 +6,9 @@ GAME.weaponData = [
     {
         name: "Stor träklubba",
         damage: "2t8"
+    },
+    {
+        name: "Slagsvärd",
+        damage: "1t10+1"
     }
 ];

@@ -197,6 +197,28 @@ a {
     font-weight: bold;
 }
 
+/* ---- Log panel ---- */
+#log span {
+    display: inline-block;
+    text-align: center;
+    font-size: 1.6em;
+    font-weight: bold;
+    color:chocolate;
+    width: 97%;
+}
+
+#log ul {
+    margin-left: 0;
+    padding-left: 0;
+}
+
+#log ul li {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: burlywood;
+    list-style-type: none;
+}
+
 /* ---- Basic stats for hero character ---- */
 
 #info table {

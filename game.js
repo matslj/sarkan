@@ -21,6 +21,7 @@ $(function() {
         animationTimeout:500, // 100 milliseconds or 10 times a second
         actionsRunning: false,
         uniqueIdCounter: 1,
+        npcsHasMovedThisSR: false,
         hero : {
             $hitpoints : $('#kpEdit'),
             $movementpoints : $('#ffEdit'),
@@ -57,14 +58,22 @@ $(function() {
             var i = 0, length = GAME.objects.length, tempObj = null, c;
             for (i; i < length; i++) {
                 tempObj = GAME.objects[i];
-                c = tempObj.getCoordinates();
-                GAME.currentMapPassableTiles[c.y][c.x] = 1;
+                // Characters which are not alive is passable
+                if (tempObj.character.isAlive()) {
+                    c = tempObj.getCoordinates();
+                    GAME.currentMapPassableTiles[c.y][c.x] = 1;
+                }
             }
         },
         
         nextRound : function() {
             // Clear selected
-            //GAME.selected = null;
+            GAME.selected = null;
+            sidebar.clearMessages();
+            
+            if (!this.npcsHasMovedThisSR) {
+                GAME.npc.AI.movement.moveNpcs();
+            }
             
             GAME.combat.resolveCombatOrder();
             
@@ -104,7 +113,7 @@ $(function() {
             GAME.actionsRunning = GAME.combat.performCombat();
             sidebar.refresh();
             if (GAME.actionsRunning) {
-                console.log("calling timeout");
+                //console.log("calling timeout");
                 setTimeout(GAME.actionLoop, 1000);
             } else {
                 console.log("finishing");
@@ -179,16 +188,13 @@ $(function() {
         GAME.walls.draw(scrollX, scrollY);
         GAME.staticObjects.draw(scrollX, scrollY, true);
         
-//        var gchar = GAME.character.loadCharacter(GAME.characterData.elf);
-//        
-//        console.log("DamageRoll: " + gchar.weapons[0].rollForDamage());
-//        console.log("DamageRoll: " + gchar.weapons[0].rollForDamage());
-//        console.log("DamageRoll: " + gchar.weapons[0].rollForDamage());
-//        
-//        gchar.toString();
-        
+        // Character loading - heroes and npcs
         var char = GAME.adventurer.Adventurer(GAME.character.loadCharacter(GAME.characterData.elf));
         char.draw(6, 9);
+        GAME.objects.push(char);
+        
+        char = GAME.adventurer.Adventurer(GAME.character.loadCharacter(GAME.characterData.human));
+        char.draw(5, 9);
         GAME.objects.push(char);
         
         var villian = GAME.npc.NPC(GAME.character.loadCharacter(GAME.characterData.troll("mage", "Trollur Flams")));
@@ -196,7 +202,7 @@ $(function() {
         GAME.objects.push(villian);
         //console.log(villian.character.toString());
         
-        villian = GAME.npc.NPC(GAME.character.loadCharacter(GAME.characterData.troll("fighter")));
+        villian = GAME.npc.NPC(GAME.character.loadCharacter(GAME.characterData.troll("fighter", "Troll1")));
         villian.draw(8,13);
         GAME.objects.push(villian);
 

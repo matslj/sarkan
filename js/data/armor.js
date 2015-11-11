@@ -6,5 +6,13 @@ GAME.armorData = [
     {
         name: "Hud",
         abs: 3
+    },
+    {
+        name: "Metallbrynja",
+        abs: 6
+    },
+    {
+        name: "Helrustning",
+        abs: 8
     }
 ];

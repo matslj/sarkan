@@ -50,7 +50,7 @@ GAME.sprite = {
      */
     DHTMLSprite : function(aCharacter) {
         
-        var character = aCharacter,
+        var characterI = aCharacter,
             // The elementBase represents the square that the object rest on.
             $elementBase = GAME.SYS_spriteParams.$drawTarget.append('<div/>').find(':last'), // this contains 'grid' cell for the element to be drawn
             // The element is the actual object standing on the elementBase (se above).
@@ -62,7 +62,7 @@ GAME.sprite = {
             // The processed image-array of the character. In the bottom of
             // the array consists of the naked character and the layers above
             // represents accessories as trousers, sword, shield, etc.
-            backgroundCSS = this.processMultipleBackgrounds(character.imgArray),
+            backgroundCSS = this.processMultipleBackgrounds(characterI.imgArray),
             unitX = 0,
             unitY = 0,
             $damageMarker = null,
@@ -105,7 +105,7 @@ GAME.sprite = {
         });
         var that = {
             movePath: movePath,
-            character: character,
+            character: characterI,
             target: targetI,
             id: _id,
             // x and y in tile unit
@@ -157,15 +157,18 @@ GAME.sprite = {
             * @returns {undefined}
             */
             markAttacking : function(theTarget, finalizeAttack) {
-                if(character.movement.isMaxHalfUsed()) {
-                    if (this.target === null) {
-                        // attackLocked = typeof finalizeAttack !== "undefined" ? finalizeAttack : false;
-                        this.target = theTarget;
-                        this.target.markAttackedBy();
-                        that.movePath.remove();
+                console.log("alive? " + this.character.isAlive());
+                if (this.character.isAlive() && theTarget.character.isAlive()) {
+                    if(this.character.movement.isMaxHalfUsed()) {
+                        if (this.target === null) {
+                            // attackLocked = typeof finalizeAttack !== "undefined" ? finalizeAttack : false;
+                            this.target = theTarget;
+                            this.target.markAttackedBy();
+                            that.movePath.remove();
+                        }
+                    } else {
+                        GAME.utils.showErrorMsg("Mer än hälften av förflyttningen är förbrukad och då är inte anfall möjligt.");
                     }
-                } else {
-                    GAME.utils.showErrorMsg("Mer än hälften av förflyttningen är förbrukad och då är inte anfall möjligt.");
                 }
             },
             unMarkAttacking: function() {
@@ -175,22 +178,30 @@ GAME.sprite = {
                 that.target = null;
             },
             printDamage: function(damage) {
-                //console.log("sssssssssssssssssssssssssss");
-                var dmg = this.character.setDamage(damage);
-                console.log("damage: " + dmg + " on: " + that.character.type);
-                $damageMarker = $element.append('<div/>').find(':last');
-                $damageMarker.append('<span style="display: inline-block; text-align: center; width: 100%; line-height: 32px; vertical-align: middle;">' + dmg + '</span>');
-                $damageMarker.css({
-                    fontSize: '12px',
-                    fontWeight: 'bold',
-                    position: 'absolute',
-                    color: '#FFF',
-                    width: GAME.tileWidth,
-                    height: GAME.tileHeight,
-                    backgroundColor: 'rgba(255,0,0,0.3)',
-                    left: '0px',
-                    top: '0px'
-                });
+                if (this.character.isAlive()) {
+                    var dmg = this.character.setDamage(damage);
+                    sidebar.addMessage("--- " + this.character.name + " förlorar " + dmg + " kp" +
+                            (this.character.isAlive() ? "" : " och är död"));
+                    if (!this.character.isAlive()) {
+                        var bg = "url(" + GAME.SYS_spriteParams.images + ") " + -704 + "px " + -384 + "px no-repeat";
+                        //console.log("bg: " + bg);
+                        elemStyle.background = bg;
+                    } else {
+                        $damageMarker = $element.append('<div/>').find(':last');
+                        $damageMarker.append('<span style="display: inline-block; text-align: center; width: 100%; line-height: 32px; vertical-align: middle;">' + dmg + '</span>');
+                        $damageMarker.css({
+                            fontSize: '12px',
+                            fontWeight: 'bold',
+                            position: 'absolute',
+                            color: '#FFF',
+                            width: GAME.tileWidth,
+                            height: GAME.tileHeight,
+                            backgroundColor: 'rgba(255,0,0,0.3)',
+                            left: '0px',
+                            top: '0px'
+                        });
+                    }
+                }
             },
             removeDamageMarker : function() {
                 if ($damageMarker) {

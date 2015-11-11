@@ -28,7 +28,8 @@ GAME.combat = {
         }
     },
 
-    performCombat : function () { 
+    performCombat : function () {
+        var source = null;
         // Attack
         // Observe that combatants are iterated in reverse order. 
 //        for (i = ilength - 1; i>-1; i--) {
@@ -45,10 +46,23 @@ GAME.combat = {
         }
         console.log("combat order length: " + this.combatOrder.length);
         if (this.combatOrder.length > 0) {
-            var source = this.combatOrder.pop();
+            source = this.combatOrder.pop();
             this.lastCharToTakeAHit = this.determineOpponent(source);
-            if (this.lastCharToTakeAHit) {
-                this.lastCharToTakeAHit.printDamage(source.character.selectedWeapon().rollForDamage());
+            while(!source.character.isAlive() && !this.lastCharToTakeAHit && this.combatOrder.length !== 0) {
+                source = this.combatOrder.pop();
+                this.lastCharToTakeAHit = this.determineOpponent(source);
+            }
+            if (this.combatOrder.length > 0) {
+                var attackRoll = GAME.utils.dice.rollDie(100);
+                var msgStr = source.character.name + " attackerar " + this.lastCharToTakeAHit.character.name + " och ";
+                if (attackRoll <= source.character.selectedWeapon().attack) {
+                    msgStr += "träffar";
+                    sidebar.addMessage(msgStr);
+                    this.lastCharToTakeAHit.printDamage(source.character.selectedWeapon().rollForDamage());
+                } else {
+                    msgStr += "missar";
+                    sidebar.addMessage(msgStr);
+                }             
             }
         }
         return this.combatOrder.length !== 0 || this.lastCharToTakeAHit !== null;
@@ -56,11 +70,11 @@ GAME.combat = {
     
     determineOpponent : function(characterObject) {
         // console.log("determineOpponent - type: " + characterObject.character.type);
-        if(characterObject.character.type === "hero") {
-            console.log("determineOpponent " + characterObject.character.type + " - " + characterObject.target.character.name);
-        } else {
-            console.log("determineOpponent " + characterObject.character.type);
-        }
+//        if(characterObject.character.type === "hero") {
+//            console.log("determineOpponent " + characterObject.character.type + " - " + characterObject.target.character.name);
+//        } else {
+//            console.log("determineOpponent " + characterObject.character.type);
+//        }
         if (characterObject.character.type === "hero") {
             // For heros it is always the player selected target that counts
             // if it is set.
@@ -79,7 +93,7 @@ GAME.combat = {
                 for (i; i < length; i++) {
                     tempObj = GAME.objects[i];
                     //console.log("tempobj: " + tempObj.character.type + " - " + (tempObj.target != null ? tempObj.target.character.name : ""));
-                    console.log("id compare: " + (tempObj.target != null ? tempObj.target.id : "-") + " och " + characterObject.id);
+                    //console.log("id compare: " + (tempObj.target != null ? tempObj.target.id : "-") + " och " + characterObject.id);
                     // Check if the npc is attacked by anyone
                     if (tempObj.target && tempObj.target.id === characterObject.id) {
                         possibleTargets.push(tempObj);

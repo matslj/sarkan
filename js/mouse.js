@@ -28,7 +28,7 @@ var mouse = {
             // Handle actions like attacking and movement of selected units
             if (GAME.selected) {
                 if (GAME.selected.character.type === "hero") {
-                    if (!clickedItem) {
+                    if (!clickedItem || !clickedItem.character.isAlive()) {
                         // Move
                         GAME.selected.moveTo(mouse.gridX, mouse.gridY);
                     } else if (clickedItem.character.type === "npc") {
@@ -104,7 +104,8 @@ var mouse = {
                     if (!GAME.selected.isLocked()) {
                         var coord = GAME.selected.getCoordinates();
                         var itemUnderPointer = mouse.itemUnderMouse();
-                        if (itemUnderPointer === null) {
+                        // Mark move to empty space (=space with no live character)
+                        if (itemUnderPointer === null || !itemUnderPointer.character.isAlive()) {
                             if (GAME.selected.character.type === "hero") {
 //                                GAME.selected.unAttack();
                                 GAME.selected.markMove(mouse.gridX, mouse.gridY);

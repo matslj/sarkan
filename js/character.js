@@ -26,8 +26,7 @@ GAME.character = {
 
     loadCharacter : function(characterData) {
         
-        var hp = -9999,
-            alive = true;
+        var hp = -9999;
         
         var char = {
             type : characterData.type,
@@ -58,6 +57,10 @@ GAME.character = {
                         if (!GAME.utils.game.isNumeric(copy[property])) {
                             var propVal = GAME.utils.dice.parseDiceString(copy[property]);
                             copy[property] = GAME.utils.dice.rollDice(propVal.nr, propVal.type) + propVal.add;
+                        } else {
+                            // The stats in the data file is stored as a string and therefore
+                            // needs to be converted to an integer
+                            copy[property] = parseInt(copy[property]);
                         }
                     }
                 }
@@ -69,14 +72,14 @@ GAME.character = {
             },
             
             getCurrentHitPoints: function() {
-                if (hp === -9999 && alive === true) {
+                if (hp === -9999) {
                     hp = this.getHitPoints();
                 }
                 return hp;
             },
             
             heal: function(healingPoints) {
-                if (alive === true) {
+                if (this.isAlive()) {
                     hp += healingPoints;
                     if (hp > this.getHitPoints()) {
                         hp = this.getHitPoints();
@@ -92,14 +95,13 @@ GAME.character = {
                 var afterAbs = this.getTotalAbs() - damage;
                 if (afterAbs < 0) {
                     hp = this.getCurrentHitPoints() + afterAbs;
-                    alive = false;
                     return Math.abs(afterAbs);
                 }
                 return 0; // return damage dealt
             },
             
             isAlive: function() {
-                return alive;
+                return (this.getCurrentHitPoints() >= 0);
             },
             
             getSb: function() {
