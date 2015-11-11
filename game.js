@@ -18,6 +18,9 @@ $(function() {
         offsetY : -4,
         objects : [],
         selected : null,
+        animationTimeout:500, // 100 milliseconds or 10 times a second
+        actionsRunning: false,
+        uniqueIdCounter: 1,
         hero : {
             $hitpoints : $('#kpEdit'),
             $movementpoints : $('#ffEdit'),
@@ -61,9 +64,14 @@ $(function() {
         
         nextRound : function() {
             // Clear selected
-            GAME.selected = null;
+            //GAME.selected = null;
             
-            GAME.combat.performCombat();
+            GAME.combat.resolveCombatOrder();
+            
+            this.actionLoop();
+            
+            // GAME.combat.performCombat();
+
             // Has any triggers been activated? (traps for example)
             // Has opponent acted yet in this round?
             // No -> perform opponent actions
@@ -80,16 +88,44 @@ $(function() {
             // If opponent wins -> perform opponent actions  
             
             // Reset all used movement and deselect all selected game objects
-            var i = 0, length = GAME.objects.length, tempObj = null;
-            for (i; i < length; i++) {
-                tempObj = GAME.objects[i];
-                tempObj.character.movement.reset();
-                tempObj.deselect();
-                tempObj.target = null;
-                
-            }
+//            var i = 0, length = GAME.objects.length, tempObj = null;
+//            for (i; i < length; i++) {
+//                tempObj = GAME.objects[i];
+//                tempObj.character.movement.reset();
+//                tempObj.deselect();
+//                tempObj.target = null;
+//                
+//            }
+//            sidebar.refresh();
+        },
+        
+        actionLoop:function() {
+
+            GAME.actionsRunning = GAME.combat.performCombat();
             sidebar.refresh();
-        }
+            if (GAME.actionsRunning) {
+                console.log("calling timeout");
+                setTimeout(GAME.actionLoop, 1000);
+            } else {
+                console.log("finishing");
+                GAME.selected = null;
+                // Reset all used movement and deselect all selected game objects
+                var i = 0, length = GAME.objects.length, tempObj = null;
+                for (i; i < length; i++) {
+                    tempObj = GAME.objects[i];
+                    tempObj.character.movement.reset();
+                    tempObj.deselect();
+                    tempObj.target = null;
+
+                }
+                sidebar.refresh();
+            }
+
+            // Call the drawing loop for the next frame using request animation frame
+//            if (GAME.running){
+//                requestAnimationFrame(GAME.drawingLoop);	
+//            }						
+	}
     };
     
     $.extend(GAME,tempGame);
@@ -156,7 +192,7 @@ $(function() {
         GAME.objects.push(char);
         
         var villian = GAME.npc.NPC(GAME.character.loadCharacter(GAME.characterData.troll("mage", "Trollur Flams")));
-        villian.draw(14, 12);
+        villian.draw(10, 9);
         GAME.objects.push(villian);
         //console.log(villian.character.toString());
         

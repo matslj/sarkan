@@ -65,7 +65,9 @@ GAME.sprite = {
             backgroundCSS = this.processMultipleBackgrounds(character.imgArray),
             unitX = 0,
             unitY = 0,
+            $damageMarker = null,
             mathFloor = Math.floor,
+            _id = GAME.uniqueIdCounter++,
             targetI = null; // The target of an attack. There can be only one victim/turn.
 
         var movePath = {
@@ -105,6 +107,7 @@ GAME.sprite = {
             movePath: movePath,
             character: character,
             target: targetI,
+            id: _id,
             // x and y in tile unit
             draw: function(x, y) {
                 unitX = x;
@@ -174,10 +177,10 @@ GAME.sprite = {
             printDamage: function(damage) {
                 //console.log("sssssssssssssssssssssssssss");
                 var dmg = this.character.setDamage(damage);
-                console.log("damage: " + dmg);
-                var $el  = $element.append('<div/>').find(':last');
-                $el.append('<span style="display: inline-block; text-align: center; width: 100%; line-height: 32px; vertical-align: middle;">' + dmg + '</span>');
-                $el.css({
+                console.log("damage: " + dmg + " on: " + that.character.type);
+                $damageMarker = $element.append('<div/>').find(':last');
+                $damageMarker.append('<span style="display: inline-block; text-align: center; width: 100%; line-height: 32px; vertical-align: middle;">' + dmg + '</span>');
+                $damageMarker.css({
                     fontSize: '12px',
                     fontWeight: 'bold',
                     position: 'absolute',
@@ -188,9 +191,12 @@ GAME.sprite = {
                     left: '0px',
                     top: '0px'
                 });
-//                setTimeout(function() {
-//                    $el.remove();
-//                }, 1000);
+            },
+            removeDamageMarker : function() {
+                if ($damageMarker) {
+                    $damageMarker.remove();
+                    $damageMarker = null;
+                }
             },
             isLocked : function() {
                 return this.target !== null;
