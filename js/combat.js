@@ -44,15 +44,17 @@ GAME.combat = {
             this.lastCharToTakeAHit.removeDamageMarker();
             this.lastCharToTakeAHit = null;
         }
-        console.log("combat order length: " + this.combatOrder.length);
+        // console.log("combat order length: " + this.combatOrder.length);
         if (this.combatOrder.length > 0) {
+            
             source = this.combatOrder.pop();
             this.lastCharToTakeAHit = this.determineOpponent(source);
-            while(!source.character.isAlive() && !this.lastCharToTakeAHit && this.combatOrder.length !== 0) {
+            while((!source.character.isAlive() || this.lastCharToTakeAHit === null) && this.combatOrder.length !== 0) {
                 source = this.combatOrder.pop();
                 this.lastCharToTakeAHit = this.determineOpponent(source);
             }
-            if (this.combatOrder.length > 0) {
+            
+            if (source.character.isAlive() && this.lastCharToTakeAHit !== null) {
                 var attackRoll = GAME.utils.dice.rollDie(100);
                 var msgStr = source.character.name + " attackerar " + this.lastCharToTakeAHit.character.name + " och ";
                 if (attackRoll <= source.character.selectedWeapon().attack) {
@@ -65,6 +67,7 @@ GAME.combat = {
                 }             
             }
         }
+        
         return this.combatOrder.length !== 0 || this.lastCharToTakeAHit !== null;
     },
     
@@ -99,7 +102,7 @@ GAME.combat = {
                         possibleTargets.push(tempObj);
                     }
                 }
-                console.log("pp: " + possibleTargets.length);
+                // console.log("pp: " + possibleTargets.length);
                 if (possibleTargets && possibleTargets.length > 0) {
                     // choose one target
                     // at this point I choose the first of the targets

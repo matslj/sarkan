@@ -157,7 +157,7 @@ GAME.sprite = {
             * @returns {undefined}
             */
             markAttacking : function(theTarget, finalizeAttack) {
-                console.log("alive? " + this.character.isAlive());
+                
                 if (this.character.isAlive() && theTarget.character.isAlive()) {
                     if(this.character.movement.isMaxHalfUsed()) {
                         if (this.target === null) {

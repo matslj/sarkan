@@ -66,13 +66,34 @@ $(function() {
             }
         },
         
+        toggleCoordinatePassability : function(x, y) {
+            if (GAME.currentMapPassableTiles[y][x] === 1) {
+                GAME.currentMapPassableTiles[y][x] = 0;
+            } else {
+                GAME.currentMapPassableTiles[y][x] = 1;
+            }
+            console.log("x: " + x + " y: " + y + " - " + GAME.currentMapPassableTiles[y][x]);
+        },
+        
+        /**
+         * 
+         * 
+         * @param {type} x
+         * @param {type} y
+         * @param {numeric} setting
+         * @returns {undefined}
+         */
+        setCoordinatePassability : function(x, y, setting) {
+            GAME.currentMapPassableTiles[y][x] = setting;
+        },
+        
         nextRound : function() {
             // Clear selected
             GAME.selected = null;
             sidebar.clearMessages();
             
             if (!this.npcsHasMovedThisSR) {
-                GAME.npc.AI.movement.moveNpcs();
+                GAME.npc.AI.movement.calculateNpcMovement();
             }
             
             GAME.combat.resolveCombatOrder();
@@ -109,32 +130,54 @@ $(function() {
         },
         
         actionLoop:function() {
-
-            GAME.actionsRunning = GAME.combat.performCombat();
-            sidebar.refresh();
-            if (GAME.actionsRunning) {
-                //console.log("calling timeout");
-                setTimeout(GAME.actionLoop, 1000);
+            var i = 0, length = GAME.objects.length, tempObj = null, npcInitiative = 0, heroInitiative = 0;
+            
+            if (GAME.npc.AI.movement.moreToMove()) {
+                console.log("mooving");
+                GAME.npc.AI.movement.moveNpcs();
+                setTimeout(GAME.actionLoop, 500);
             } else {
-                console.log("finishing");
-                GAME.selected = null;
-                // Reset all used movement and deselect all selected game objects
-                var i = 0, length = GAME.objects.length, tempObj = null;
-                for (i; i < length; i++) {
-                    tempObj = GAME.objects[i];
-                    tempObj.character.movement.reset();
-                    tempObj.deselect();
-                    tempObj.target = null;
-
-                }
+                GAME.actionsRunning = GAME.combat.performCombat();
                 sidebar.refresh();
-            }
+                if (GAME.actionsRunning) {
+                    //console.log("calling timeout");
+                    setTimeout(GAME.actionLoop, 1000);
+                } else {
 
-            // Call the drawing loop for the next frame using request animation frame
-//            if (GAME.running){
-//                requestAnimationFrame(GAME.drawingLoop);	
-//            }						
-	}
+                    GAME.selected = null;
+                    // Reset all used movement and deselect all selected game objects
+
+                    for (i; i < length; i++) {
+                        tempObj = GAME.objects[i];
+                        tempObj.character.movement.reset();
+                        tempObj.deselect();
+                        tempObj.target = null;
+
+                    }
+                    sidebar.refresh();
+                    this.npcsHasMovedThisSR = false;
+
+                    // Roll for initiative
+                    heroInitiative = GAME.utils.dice.rollDie(10);
+                    npcInitiative = GAME.utils.dice.rollDie(10);
+                    while (heroInitiative === npcInitiative) {
+                        heroInitiative = GAME.utils.dice.rollDie(10);
+                        npcInitiative = GAME.utils.dice.rollDie(10);
+                    }
+                    console.log("heroI: " + heroInitiative + " - npcI: " + npcInitiative);
+                    if (npcInitiative > heroInitiative) {
+                        GAME.npc.AI.movement.calculateNpcMovement();
+                        this.npcsHasMovedThisSR = true;
+                    }
+                    console.log("Round complete");
+                }
+
+                // Call the drawing loop for the next frame using request animation frame
+    //            if (GAME.running){
+    //                requestAnimationFrame(GAME.drawingLoop);	
+    //            }						
+            }
+        }
     };
     
     $.extend(GAME,tempGame);
@@ -206,7 +249,30 @@ $(function() {
         villian.draw(8,13);
         GAME.objects.push(villian);
 
-        // GAME.adventurers.paintObstructedTiles();
+//        GAME.rebuildPassableGrid();
+//        GAME.paintObstructedTiles();
     });
+    
+    GAME.paintObstructedTiles = function() {
+    // Tile matrix to paint
+    var tileMatrix = GAME.currentMapPassableTiles; // alt. GAME.obstructedTiles
+    
+    for (var i = 0; i < GAME.tilesDown; i++) {
+        for( var j = 0; j < GAME.tilesAcross; j++) {
+            // console.log(emptyTiles[i].x + " - " + emptyTiles[i].y)
+            if (tileMatrix[i][j]) {
+                var $el  = GAME.container.append('<div/>').find(':last');
+                $el.css({
+                    position: 'absolute',
+                    width: GAME.SYS_spriteParams.width,
+                    height: GAME.SYS_spriteParams.height,
+                    backgroundColor: 'blue',
+                    left: j * GAME.SYS_spriteParams.width + 'px',
+                    top: i * GAME.SYS_spriteParams.height + 'px'
+                });
+            }
+        }
+    }
+}
 
 });
