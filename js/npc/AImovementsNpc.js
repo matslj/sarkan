@@ -56,22 +56,15 @@ GAME.namespace("npc.AI").movement = {
                 tempObj = GAME.objects[i];
                 // console.log("Npc som ska flytta: " + tempObj.character.name);
                 result = this.findClosestTarget(tempObj);
-                // Make the position where the npc will end up impassable.
-                GAME.setCoordinatePassability(result.path[result.path.length - 2].x, result.path[result.path.length - 2].y, 1);
-//                var $el  = GAME.container.append('<div/>').find(':last');
-//                $el.css({
-//                    position: 'absolute',
-//                    width: GAME.SYS_spriteParams.width,
-//                    height: GAME.SYS_spriteParams.height,
-//                    backgroundColor: 'blue',
-//                    left: result.path[result.path.length - 1].x * GAME.SYS_spriteParams.width + 'px',
-//                    top: result.path[result.path.length - 1].y * GAME.SYS_spriteParams.height + 'px'
-//                });
-                console.log(tempObj.character.name + " - " + result.path[result.path.length - 1].x + " - " + result.path[result.path.length - 1].y);
-                result.npc = tempObj;
-                result.moveCounter = 0;
-                result.moveStop = result.path.length - 1;
-                this.npcMovement.push(result);
+                if (result !== null) {
+                    // Make the position where the npc will end up impassable.
+                    GAME.setCoordinatePassability(result.path[result.path.length - 2].x, result.path[result.path.length - 2].y, 1);
+                    // console.log(tempObj.character.name + " - " + result.path[result.path.length - 1].x + " - " + result.path[result.path.length - 1].y);
+                    result.npc = tempObj;
+                    result.moveCounter = 0;
+                    result.moveStop = result.path.length - 1;
+                    this.npcMovement.push(result);
+                }
             }
         }
     },
@@ -93,7 +86,7 @@ GAME.namespace("npc.AI").movement = {
         // First pick out the heroes in a list with possible targets
         var i = 0, ilength = GAME.objects.length;
         for (i; i < ilength; i++) {
-            if (GAME.objects[i].character.type === "hero") {
+            if (GAME.objects[i].character.type === "hero" && GAME.objects[i].character.isAlive()) {
                 targetArray.push(GAME.objects[i]);
                 // console.log(GAME.objects[i].character.name + " - " + GAME.objects[i].getCoordinates());
             }

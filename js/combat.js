@@ -54,30 +54,31 @@ GAME.combat = {
                 this.lastCharToTakeAHit = this.determineOpponent(source);
             }
             
-            if (source.character.isAlive() && this.lastCharToTakeAHit !== null) {
-                var attackRoll = GAME.utils.dice.rollDie(100);
-                var msgStr = source.character.name + " attackerar " + this.lastCharToTakeAHit.character.name + " och ";
-                if (attackRoll <= source.character.selectedWeapon().attack) {
-                    msgStr += "träffar";
-                    sidebar.addMessage(msgStr);
-                    this.lastCharToTakeAHit.printDamage(source.character.selectedWeapon().rollForDamage());
-                } else {
-                    msgStr += "missar";
-                    sidebar.addMessage(msgStr);
-                }             
-            }
+            this.makeTheAttack(source);
         }
         
         return this.combatOrder.length !== 0 || this.lastCharToTakeAHit !== null;
     },
     
+    makeTheAttack : function(attacker) {
+        var attackRoll = 0;
+        var msgStr = '';
+        
+        if (attacker.character.isAlive() && this.lastCharToTakeAHit !== null) {
+            attackRoll = GAME.utils.dice.rollDie(100);
+            msgStr = attacker.character.name + " attackerar " + this.lastCharToTakeAHit.character.name + " och ";
+            if (attackRoll <= attacker.character.selectedWeapon().attack) {
+                msgStr += "träffar";
+                sidebar.addMessage(msgStr);
+                this.lastCharToTakeAHit.printDamage(attacker.character.selectedWeapon().rollForDamage());
+            } else {
+                msgStr += "missar";
+                sidebar.addMessage(msgStr);
+            }             
+        }
+    },
+    
     determineOpponent : function(characterObject) {
-        // console.log("determineOpponent - type: " + characterObject.character.type);
-//        if(characterObject.character.type === "hero") {
-//            console.log("determineOpponent " + characterObject.character.type + " - " + characterObject.target.character.name);
-//        } else {
-//            console.log("determineOpponent " + characterObject.character.type);
-//        }
         if (characterObject.character.type === "hero") {
             // For heros it is always the player selected target that counts
             // if it is set.
@@ -88,7 +89,7 @@ GAME.combat = {
         } else {
             // Npc
             // If already attacking someone, keep on doing it
-            if (characterObject.target) {
+            if (characterObject.target && characterObject.target.character.isAlive()) {
                 return characterObject.target;
             } else {
                 // AI for npc opponent choosing
