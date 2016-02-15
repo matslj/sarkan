@@ -87,95 +87,73 @@ $(function() {
             GAME.currentMapPassableTiles[y][x] = setting;
         },
         
+        rollForInitiative: function() {
+            var npcInitiative = 0, heroInitiative = 0;
+            // Roll for initiative (each side roll a d10)
+            heroInitiative = GAME.utils.dice.rollDie(10);
+            npcInitiative = GAME.utils.dice.rollDie(10);
+            while (heroInitiative === npcInitiative) {
+                heroInitiative = GAME.utils.dice.rollDie(10);
+                npcInitiative = GAME.utils.dice.rollDie(10);
+            }
+            console.log("heroI: " + heroInitiative + " - npcI: " + npcInitiative);
+            if (npcInitiative > heroInitiative) {
+                GAME.npc.AI.movement.calculateNpcMovement();
+                this.npcsHasMovedThisSR = true;
+            }
+        },
+        
+        resetGameObjects : function() {
+            var i = 0, length = GAME.objects.length, tempObj = null;
+            // Reset all used movement and deselect all selected game objects
+            for (i; i < length; i++) {
+                tempObj = GAME.objects[i];
+                tempObj.character.movement.reset();
+                tempObj.deselect();
+                tempObj.target = null;
+            }
+        },
+        
         nextRound : function() {
             // Clear selected
             GAME.selected = null;
+            // Clear sidebar (with status messages and such)
             sidebar.clearMessages();
             
+            // If NPC hasn't moved this SR, it is time for them to move
+            // The first round of each action map like this one, always
+            // goes to the playing characters.
             if (!this.npcsHasMovedThisSR) {
                 GAME.npc.AI.movement.calculateNpcMovement();
             }
             
+            // When all movement is done for the current round -> determine
+            // attack order among the combat participants.
             GAME.combat.resolveCombatOrder();
             
+            // Enact the actions (movement and combat)
             this.actionLoop();
-            
-            // GAME.combat.performCombat();
-
-            // Has any triggers been activated? (traps for example)
-            // Has opponent acted yet in this round?
-            // No -> perform opponent actions
-            // 
-            // Resolve combat
-            
-            // if close combat attack in smi order
-            // - if target has cc weapon/shield
-            //      - if target has not attacked
-            //            -> choose between attack and parry
-            
-            // Resolve initiative (1d10) for each side; highest wins
-            
-            // If opponent wins -> perform opponent actions  
-            
-            // Reset all used movement and deselect all selected game objects
-//            var i = 0, length = GAME.objects.length, tempObj = null;
-//            for (i; i < length; i++) {
-//                tempObj = GAME.objects[i];
-//                tempObj.character.movement.reset();
-//                tempObj.deselect();
-//                tempObj.target = null;
-//                
-//            }
-//            sidebar.refresh();
         },
         
         actionLoop:function() {
-            var i = 0, length = GAME.objects.length, tempObj = null, npcInitiative = 0, heroInitiative = 0;
-            
             if (GAME.npc.AI.movement.moreToMove()) {
-                console.log("mooving");
                 GAME.npc.AI.movement.moveNpcs();
                 setTimeout(GAME.actionLoop, 500);
             } else {
                 GAME.actionsRunning = GAME.combat.performCombat();
-                sidebar.refresh();
                 if (GAME.actionsRunning) {
-                    //console.log("calling timeout");
+                    sidebar.refresh();
                     setTimeout(GAME.actionLoop, 1000);
                 } else {
-
                     GAME.selected = null;
-                    // Reset all used movement and deselect all selected game objects
-
-                    for (i; i < length; i++) {
-                        tempObj = GAME.objects[i];
-                        tempObj.character.movement.reset();
-                        tempObj.deselect();
-                        tempObj.target = null;
-
-                    }
+                    GAME.resetGameObjects();
+                    
                     sidebar.refresh();
                     this.npcsHasMovedThisSR = false;
 
-                    // Roll for initiative
-                    heroInitiative = GAME.utils.dice.rollDie(10);
-                    npcInitiative = GAME.utils.dice.rollDie(10);
-                    while (heroInitiative === npcInitiative) {
-                        heroInitiative = GAME.utils.dice.rollDie(10);
-                        npcInitiative = GAME.utils.dice.rollDie(10);
-                    }
-                    console.log("heroI: " + heroInitiative + " - npcI: " + npcInitiative);
-                    if (npcInitiative > heroInitiative) {
-                        GAME.npc.AI.movement.calculateNpcMovement();
-                        this.npcsHasMovedThisSR = true;
-                    }
+                    GAME.rollForInitiative();
                     console.log("Round complete");
-                }
-
-                // Call the drawing loop for the next frame using request animation frame
-    //            if (GAME.running){
-    //                requestAnimationFrame(GAME.drawingLoop);	
-    //            }						
+                }						
             }
         }
     };

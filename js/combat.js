@@ -1,13 +1,41 @@
+/**
+ * This class deals with everything that has to do with combat.
+ * 
+ * @type type
+ */
 GAME.combat = {
     combatOrder: null,
-    lastCharToTakeAHit: null,
+    source: null,
+    targetOfAttack: null,
     
+    /**
+     * Before any blows are struck, the initiative order between the
+     * combatants must be established. In this game, initiative order
+     * is determined by the dexterity value of each character; higher
+     * dex strikes before lower dex.
+     * <p>
+     * This method sorts the combatants in increasing dex order,
+     * so the combatant with the highest dex is last in the resulting
+     * array (which enables pop()-ing later on).
+     * <p>
+     * This method should only be called once each SR (combat round).
+     * <p>
+     * This method affects the following attributes:
+     * <ul>
+     * <li>this.combatOrder - an array populated as mentioned above
+     * <li>this.source - reset to null
+     * <li>this.currentCombattant - reset to 0
+     * </ul>
+     * 
+     * @returns {undefined} nothing is returned
+     */
     resolveCombatOrder : function () {
         // Establish combat order
         var i = 0, 
             j = 0,
             tempObj = null;
     
+        this.source = null;
         this.currentCombatant = 0;
         this.combatOrder = GAME.objects.slice(0); // Shallow copy of all characters
         var ilength = this.combatOrder.length;
@@ -26,51 +54,47 @@ GAME.combat = {
                 this.combatOrder[j] = tempObj;
             }
         }
+        // Observe that combatants are sorted in reverse order; the first to 
+        // perform an action is the last in the list.
     },
 
+    /**
+     * Performs a round of combat.
+     * 
+     * @returns {Boolean}
+     */
     performCombat : function () {
-        var source = null;
-        // Attack
-        // Observe that combatants are iterated in reverse order. 
-//        for (i = ilength - 1; i>-1; i--) {
-//            tempObj = this.determineOpponent(combatOrder[i]);
-//            if (tempObj) {
-//                tempObj.printDamage(combatOrder[i].character.selectedWeapon().rollForDamage());
-//            }
-//            //console.log(tempObj.character.getTitle() + " smi: " + tempObj.character.stats.smi);
-//        }
-
-        if (this.lastCharToTakeAHit !== null) {
-            this.lastCharToTakeAHit.removeDamageMarker();
-            this.lastCharToTakeAHit = null;
+        // Remove (graphic) damage marker placed in the last attack by this char.
+        if (this.targetOfAttack !== null) {
+            this.targetOfAttack.removeDamageMarker();
+            this.targetOfAttack = null;
         }
         // console.log("combat order length: " + this.combatOrder.length);
-        if (this.combatOrder.length > 0) {
-            
-            source = this.combatOrder.pop();
-            this.lastCharToTakeAHit = this.determineOpponent(source);
-            while((!source.character.isAlive() || this.lastCharToTakeAHit === null) && this.combatOrder.length !== 0) {
-                source = this.combatOrder.pop();
-                this.lastCharToTakeAHit = this.determineOpponent(source);
-            }
-            
-            this.makeTheAttack(source);
+        if (this.combatOrder.length > 0) {    
+            this.setAttackerAndDefender();
+            this.makeTheAttack(this.source);
         }
         
-        return this.combatOrder.length !== 0 || this.lastCharToTakeAHit !== null;
+        return this.combatOrder.length !== 0 || this.targetOfAttack !== null;
     },
     
+    /**
+     * Private (to the combat-class).
+     * 
+     * @param {type} attacker
+     * @returns {undefined}
+     */
     makeTheAttack : function(attacker) {
         var attackRoll = 0;
         var msgStr = '';
         
-        if (attacker.character.isAlive() && this.lastCharToTakeAHit !== null) {
+        if (attacker.character.isAlive() && this.targetOfAttack !== null) {
             attackRoll = GAME.utils.dice.rollDie(100);
-            msgStr = attacker.character.name + " attackerar " + this.lastCharToTakeAHit.character.name + " och ";
+            msgStr = attacker.character.name + " attackerar " + this.targetOfAttack.character.name + " och ";
             if (attackRoll <= attacker.character.selectedWeapon().attack) {
                 msgStr += "träffar";
                 sidebar.addMessage(msgStr);
-                this.lastCharToTakeAHit.printDamage(attacker.character.selectedWeapon().rollForDamage());
+                this.targetOfAttack.printDamage(attacker.character.selectedWeapon().rollForDamage());
             } else {
                 msgStr += "missar";
                 sidebar.addMessage(msgStr);
@@ -78,6 +102,28 @@ GAME.combat = {
         }
     },
     
+    /**
+     * Sets attacker (this.source) and defender (this.targetOfAttack).
+     * This method loops util it finds an attacker has a target to attack or
+     * util the list of combatants (this.combatOrder) is empty.
+     * 
+     * @returns {undefined} only the default undefined
+     */
+    setAttackerAndDefender: function() {
+        this.source = this.combatOrder.pop();
+        this.targetOfAttack = this.determineOpponent(this.source);
+        while((!this.source.character.isAlive() || this.targetOfAttack === null) && this.combatOrder.length !== 0) {
+            this.source = this.combatOrder.pop();
+            this.targetOfAttack = this.determineOpponent(this.source);
+        }
+    },
+    
+    /**
+     * AI for determining opponent.
+     * 
+     * @param {type} characterObject
+     * @returns {unresolved}
+     */
     determineOpponent : function(characterObject) {
         if (characterObject.character.type === "hero") {
             // For heros it is always the player selected target that counts
@@ -98,6 +144,7 @@ GAME.combat = {
                     tempObj = GAME.objects[i];
                     //console.log("tempobj: " + tempObj.character.type + " - " + (tempObj.target != null ? tempObj.target.character.name : ""));
                     //console.log("id compare: " + (tempObj.target != null ? tempObj.target.id : "-") + " och " + characterObject.id);
+                    
                     // Check if the npc is attacked by anyone
                     if (tempObj.target && tempObj.target.id === characterObject.id) {
                         possibleTargets.push(tempObj);
