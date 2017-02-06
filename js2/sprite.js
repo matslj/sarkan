@@ -19,10 +19,10 @@ GAME.sprite = {
             bcLength = backgroundCoords.length;
 
         for (i = 0; i < bcLength; i++) {
-            coordX = -(GAME.SYS_spriteParams.width * backgroundCoords[i].x);
-            coordY = -(GAME.SYS_spriteParams.height * backgroundCoords[i].y);
+            coordX = -(GAME.constants.SPRITE_DATA.width * backgroundCoords[i].x);
+            coordY = -(GAME.constants.SPRITE_DATA.height * backgroundCoords[i].y);
             // background: url(img_flwr.gif) right bottom no-repeat, url(paper.gif) left top repeat;
-            background += "url(" + GAME.SYS_spriteParams.images + ") " + coordX + "px " + coordY + "px no-repeat";
+            background += "url(" + GAME.constants.SPRITE_DATA.images + ") " + coordX + "px " + coordY + "px no-repeat";
             if (i !== (bcLength - 1)) {
                 background += ", ";
             }
@@ -49,10 +49,9 @@ GAME.sprite = {
      * @returns {DHTMLSprite.that} an DHTMLSprite-instance
      */
     DHTMLSprite : function(aCharacter) {
-        
         var characterI = aCharacter,
             // The elementBase represents the square that the object rest on.
-            $elementBase = GAME.SYS_spriteParams.$drawTarget.append('<div/>').find(':last'), // this contains 'grid' cell for the element to be drawn
+            $elementBase = GAME.constants.SPRITE_DATA.$drawTarget.append('<div/>').find(':last'), // this contains 'grid' cell for the element to be drawn
             // The element is the actual object standing on the elementBase (se above).
             $element =  $elementBase.append('<div/>').find(':last'), // this contains the element to be drawn
             // This is a shortcut to the style-property of the elementBase
@@ -86,21 +85,22 @@ GAME.sprite = {
         // The cssdata which does not change over time for the sprite
         var cssObj = {
             position: 'absolute',
-            width: GAME.SYS_spriteParams.width,
-            height: GAME.SYS_spriteParams.height,
+            width: GAME.constants.SPRITE_DATA.width,
+            height: GAME.constants.SPRITE_DATA.height,
             background: backgroundCSS,
+            zIndex: 1000,
             display: 'none',
             // The element with the images to be drawn (the actual sprite)
             // is displaced by a third in order to create a simple 3d-effect.
             left: '0px',
-            top: -(GAME.SYS_spriteParams.height/3 >> 0) + 'px'
+            top: -(GAME.constants.SPRITE_DATA.height/3 >> 0) + 'px'
         };
         // console.log(cssObj);
         $element.css(cssObj);
         $elementBase.css({
             position: 'absolute',
-            width: GAME.SYS_spriteParams.width,
-            height: GAME.SYS_spriteParams.height,
+            width: GAME.constants.SPRITE_DATA.width,
+            height: GAME.constants.SPRITE_DATA.height,
             border: "1px solid transparent"
         });
         var that = {
@@ -114,11 +114,15 @@ GAME.sprite = {
                     styleY = 0;
                 unitX = typeof x !== "undefined" && typeof x === "number" ? x : unitX;
                 unitY = typeof y !== "undefined" && typeof y === "number" ? y : unitY;
-                styleX = unitX * GAME.SYS_spriteParams.width; // convert from tile unit to pixels
-                styleY = unitY * GAME.SYS_spriteParams.height; // convert from tile unit to pixels
+                styleX = unitX * GAME.constants.SPRITE_DATA.width; // convert from tile unit to pixels
+                styleY = unitY * GAME.constants.SPRITE_DATA.height; // convert from tile unit to pixels
                 elemBaseStyle.left = styleX + 'px';
                 elemBaseStyle.top = styleY + 'px';
                 this.show();
+            },
+            setDeltaCoords: function(deltaX, deltaY) {
+                unitX = unitX + deltaX;
+                unitY = unitY + deltaY;
             },
             setCoordinates: function(x, y) {
                 unitX = x;
@@ -191,7 +195,7 @@ GAME.sprite = {
                     sidebar.addMessage("--- " + this.character.name + " förlorar " + dmg + " kp" +
                             (this.character.isAlive() ? "" : " och är död"));
                     if (!this.character.isAlive()) {
-                        var bg = "url(" + GAME.SYS_spriteParams.images + ") " + -704 + "px " + -384 + "px no-repeat";
+                        var bg = "url(" + GAME.constants.SPRITE_DATA.images + ") " + -704 + "px " + -384 + "px no-repeat";
                         //console.log("bg: " + bg);
                         elemStyle.background = bg;
                     } else {

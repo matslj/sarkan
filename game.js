@@ -22,6 +22,9 @@ $(function() {
         actionsRunning: false,
         uniqueIdCounter: 1,
         npcsHasMovedThisSR: false,
+        
+        combat : GAME.combat.Combat(),
+        npcMovement : GAME.npc.AI.Movement(),
         hero : {
             $hitpoints : $('#kpEdit'),
             $movementpoints : $('#ffEdit'),
@@ -98,7 +101,7 @@ $(function() {
             }
             console.log("heroI: " + heroInitiative + " - npcI: " + npcInitiative);
             if (npcInitiative > heroInitiative) {
-                GAME.npc.AI.movement.calculateNpcMovement();
+                GAME.npcMovement.calculateNpcMovement();
                 this.npcsHasMovedThisSR = true;
             }
         },
@@ -110,7 +113,9 @@ $(function() {
                 tempObj = GAME.objects[i];
                 tempObj.character.movement.reset();
                 tempObj.deselect();
-                tempObj.target = null;
+                if (tempObj.target !== null && !tempObj.target.character.isAlive()) {
+                    tempObj.target = null;
+                }
             }
         },
         
@@ -124,7 +129,7 @@ $(function() {
             // The first round of each action map like this one, always
             // goes to the playing characters.
             if (!this.npcsHasMovedThisSR) {
-                GAME.npc.AI.movement.calculateNpcMovement();
+                GAME.npcMovement.calculateNpcMovement();
             }
             
             // When all movement is done for the current round -> determine
@@ -135,22 +140,37 @@ $(function() {
             this.actionLoop();
         },
         
-        actionLoop:function() {
-            if (GAME.npc.AI.movement.moreToMove()) {
-                GAME.npc.AI.movement.moveNpcs();
+        /**
+         * 
+         * @param {type} parry set to true to indicate an parry attempt
+         */
+        actionLoop:function(parry) {
+            var combatObject = null;
+            // NPC move action
+            if (GAME.npcMovement.moreToMove()) {
+                GAME.npcMovement.moveNpcs();
                 setTimeout(GAME.actionLoop, 500);
-            } else {
-                GAME.actionsRunning = GAME.combat.performCombat();
-                if (GAME.actionsRunning) {
+            }
+            // Combat phase
+            else {
+                combatObject = GAME.combat.performCombat(parry);
+                if (combatObject.state === GAME.combat.NEXT_COMBATANT) {
+                    console.log("Next combatant");
                     sidebar.refresh();
                     setTimeout(GAME.actionLoop, 1000);
+                } else if (combatObject.state === GAME.combat.WAIT_FOR_PARRY) {
+                    console.log("Wait for parry");
+                    // call dialog and have dialog call this GAME.actionLoop() with
+                    // the parry parameter set to true or false
                 } else {
+                    console.log("End of combat");
                     GAME.selected = null;
                     GAME.resetGameObjects();
                     
                     sidebar.refresh();
                     this.npcsHasMovedThisSR = false;
 
+                    // Roll for initiative for the two sides fighting
                     GAME.rollForInitiative();
                     console.log("Round complete");
                 }						

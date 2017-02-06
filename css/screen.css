@@ -37,8 +37,8 @@ a {
     border-left:4px solid #000;
     border-right:4px solid #000;
     background-color: #000; /* #3090C7; */
-    width:864px;
-    height:600px;
+    width: 500px; /* 864px; */
+    height: 300px; /* 600px; */
 }
 
 #vuuuu div {
